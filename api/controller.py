@@ -18,21 +18,27 @@ def connect():
         # Step 1: Extract POST data from request body as JSON
         json_data = request.get_json()
 
+        result = {}
         _TYPE  = json_data['type']
         _PORT  = json_data['port']
         _HOST  = json_data['host']
         _USER  = json_data['user']
         _PASS  = json_data['pass']
+        _DATABASE  = json_data['database']
 
         
-        engine = create_engine('mysql+pymysql://root:@localhost')
+        engine = create_engine('mysql+pymysql://'+_USER+':'+_PASS+'@'+_HOST+':'+_PORT)
 
-        list_dbs = engine.connect().execute("show databases")
+        if(engine.connect()):
+                result["status"] = True
+                result["dbs"] = [db for (db,) in engine.execute("show databases") ]
+                if(_DATABASE != "" and _DATABASE in result["dbs"]):
+                        engine.connect().execute("USE "+_DATABASE +" ;")
+                        result["tabs"] = [tab for (tab,) in engine.execute("SHOW TABLES;")   ]
 
+                
         # # Step 5: Return the response as JSON
-        ls = [db for (db,) in list_dbs ]
-        return jsonify({'dbs': list(ls),
-                        'status': True}) 
+        return jsonify(result) 
 
 
 # @advance_app.route('/predict/classifier', methods=['POST'])
