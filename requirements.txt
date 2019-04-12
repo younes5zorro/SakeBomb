@@ -10,7 +10,7 @@ jdcal==1.4
 Jinja2==2.10.1
 MarkupSafe==1.1.1
 numpy==1.16.2
-openpyxl==2.6.2
+openpyxl==2.5.0
 pandas==0.24.2
 petl==1.2.0
 pymongo==3.7.2

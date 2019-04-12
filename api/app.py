@@ -8,7 +8,11 @@ def create_app() -> Flask:
     flask_app = Flask('advance_api')
 
     # import blueprints
-    from api.controller import advance_app
+    from api.connection import advance_app
+    from api.algos import advance_alogs
+
+
     flask_app.register_blueprint(advance_app)
+    flask_app.register_blueprint(advance_alogs)
 
     return flask_app

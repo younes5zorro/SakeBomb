@@ -1,3 +1,4 @@
 env/
 models/
 uploads/
+__pycache__
