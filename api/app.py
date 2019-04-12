@@ -10,9 +10,11 @@ def create_app() -> Flask:
     # import blueprints
     from api.connection import advance_app
     from api.algos import advance_alogs
+    from api.joins import advance_join
 
 
     flask_app.register_blueprint(advance_app)
     flask_app.register_blueprint(advance_alogs)
+    flask_app.register_blueprint(advance_join)
 
     return flask_app

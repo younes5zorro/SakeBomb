@@ -6,6 +6,7 @@ import requests
 
 from io import BytesIO
 import petl as etl 
+import json
 
 
 advance_app = Blueprint('advance_app', __name__)
@@ -25,7 +26,6 @@ def connect_db():
         json_data = request.get_json()
 
         result = {}
-        _TYPE  = json_data['type']
         _PORT  = json_data['port']
         _HOST  = json_data['host']
         _USER  = json_data['user']
@@ -82,8 +82,8 @@ def connect_file():
         # Step 5: Return the response as JSON
         return jsonify(result) 
 
-@advance_app.route('/v1/data/file', methods=['POST'])
-def data_file():
+@advance_app.route('/v1/data/file/excel', methods=['POST'])
+def data_excel():
     if request.method == 'POST':
         
         json_data = request.get_json()
@@ -109,8 +109,29 @@ def data_file():
                 result["status"] =  True
 
         else:
-                result["Error"] =  "Sheet Empty"
+                result["Error"] =  "Sheet is Empty"
                 result["status"] =  False
+
+        # Step 5: Return the response as JSON
+        return jsonify(result) 
+
+
+
+@advance_app.route('/v1/data/file/csv', methods=['POST'])
+def data_csv():
+    if request.method == 'POST':
+        result = {}
+        
+        json_data = request.get_json()
+        link  = json_data['link']
+
+        tab = etl.fromcsv(link) 
+
+        result["header"]  = list(etl.header(tab))
+
+        result["data"] = list(etl.dicts(tab))
+        result["status"] =  True
+
 
         # Step 5: Return the response as JSON
         return jsonify(result) 
@@ -123,7 +144,6 @@ def data_db():
         json_data = request.get_json()
 
         result = {}
-        _TYPE  = json_data['type']
         _PORT  = json_data['port']
         _HOST  = json_data['host']
         _USER  = json_data['user']
@@ -152,10 +172,10 @@ def data_db():
                                         result["data"] = list(etl.dicts(tab))
                                 else:
                                         result["status"] = False
-                                        result["error"] = "Table not in database"
+                                        result["error"] = "Table not in the database"
                         else:
                                 result["status"] = False
-                                result["error"] = "Database not in Server"
+                                result["error"] = "Database not in the Server"
                 else:
                         result["status"] = False
                         result["error"] = "Not database specified"

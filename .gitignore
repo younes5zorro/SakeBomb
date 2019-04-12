@@ -2,3 +2,5 @@ env/
 models/
 uploads/
 __pycache__
+*/__pycache__
+.vscode/
