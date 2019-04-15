@@ -170,6 +170,8 @@ def data_db():
                                         
                                         result["header"] = list(etl.header(tab))
                                         result["data"] = list(etl.dicts(tab))
+
+
                                 else:
                                         result["status"] = False
                                         result["error"] = "Table not in the database"
