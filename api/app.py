@@ -14,7 +14,7 @@ def create_app() -> Flask:
 
 
     flask_app.register_blueprint(advance_app)
-    flask_app.register_blueprint(advance_alogs)
     flask_app.register_blueprint(advance_join)
+    flask_app.register_blueprint(advance_alogs)
 
     return flask_app

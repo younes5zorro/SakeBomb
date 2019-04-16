@@ -45,7 +45,7 @@ def get_from_mysql(cnx):
 
         engine.connect().execute("USE "+_DATABASE +" ;")
 
-        rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE +' LIMIT 10')
+        rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE +' LIMIT 100')
 
         data =[dict(row) for row in rows]
 
@@ -87,31 +87,51 @@ def join_table(type,tab_L,tab_R,key_L,key_R):
                return etl.antijoin(tab_L,tab_R,lkey=key_L,rkey=key_R)
         elif(type == "complement"):
         # rows in tab1 that are not in tab2
-               return etl.complement(tab_L,tab_R,lkey=key_L,rkey=key_R)
+               return etl.complement(tab_L,tab_R)
         # rows in a that are also in b
         elif(type == "intersection"):
                return etl.intersection(tab_L,tab_R)
         elif(type == "stack"):
         # Concatenate tables        
-               return etl.stack(tab_L,tab_R,lkey=key_L,rkey=key_R)
+               return etl.stack(tab_L,tab_R)
         elif(type == "cat"):
         # Concatenate tables
-               return etl.cat(tab_L,tab_R,lkey=key_L,rkey=key_R)
+               return etl.cat(tab_L,tab_R)
         
 @advance_join.route('/v1/join', methods=['POST'])
 def join():
     if request.method == 'POST':
         
-        json_data = request.get_json()
-        tab_L = mapping(json_data[0])
-        key_L = json_data[0]["key"]
-        tab_R = mapping(json_data[1])
-        key_R = json_data[1]["key"]
+       json_data = request.get_json()
 
-        type_join = json_data[0]["join"]
-        
-        tab  = join_table(type_join,tab_L,tab_R,key_L,key_R)
-        result = list(etl.dicts(tab))
+       result = {}
+
+       tab_L = mapping(json_data[0])
+       key_L = json_data[0]["key"]
+       tab_R = mapping(json_data[1])
+       key_R = json_data[1]["key"]
+
+       type_join = json_data[0]["join"]
+
+       tab  = join_table(type_join,tab_L,tab_R,key_L,key_R)
+
+       df = etl.todataframe(tab)
+
+       result["data"] = list(etl.dicts(tab))
+       result["categorical"] = []
+       result["numerical"] = []
+       
+       for var in df.columns:
+
+              if df[var].dtypes=='O':
+                     result["categorical"].append(var)
+              else:
+                     if len(df[var].unique())<20:
+                            result["categorical"].append(var)
+                     else:
+                            result["numerical"].append(var)
+
+
         # Step 5: Return the response as JSON
-        return jsonify(result) 
+       return jsonify(result) 
 

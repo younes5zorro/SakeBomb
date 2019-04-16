@@ -96,22 +96,18 @@ def data_excel():
         result = {}
         excel_file = openpyxl.load_workbook(filename=BytesIO(file))
 
-        if sheet not in excel_file.get_sheet_names():
-                result["status"] =  False
-                result["Error"] =  "Sheet not in the file "
-                return jsonify(result) 
-
+      
         tab = etl.fromxlsx(filename=BytesIO(file),sheet =sheet)
         if tab:
                 result["sheet_name"] = sheet
                 result["header"] = list(etl.header(tab))
                 result["data"] =  list(etl.dicts(tab))
-                result["status"] =  True
 
         else:
-                result["Error"] =  "Sheet is Empty"
-                result["status"] =  False
-
+                result["sheet_name"] = sheet
+                result["header"] = []
+                result["data"] =  []
+               
         # Step 5: Return the response as JSON
         return jsonify(result) 
 
@@ -153,37 +149,17 @@ def data_db():
 
         engine = create_engine('mysql+pymysql://'+_USER+':'+_PASS+'@'+_HOST+':'+_PORT)
 
-        if(engine.connect()):
-                result["dbs"] = [db for (db,) in engine.execute("show databases") ]
-                if(_DATABASE != ""  ):
-                        if (_DATABASE in result["dbs"]):
-                                result["status"] = True
-                                engine.connect().execute("USE "+_DATABASE +" ;")
-                                result["tabs"] = [tab for (tab,) in engine.execute("SHOW TABLES;")   ]
 
-                                if(_TABLE in result["tabs"]):   
-                                        rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE +' LIMIT 10')
+        rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE +' LIMIT 10')
 
-                                        data =[dict(row) for row in rows]
+        data =[dict(row) for row in rows]
 
-                                        tab  = etl.fromdicts(data)
-                                        
-                                        result["header"] = list(etl.header(tab))
-                                        result["data"] = list(etl.dicts(tab))
+        tab  = etl.fromdicts(data)
+        
+        result["header"] = list(etl.header(tab))
+        result["data"] = list(etl.dicts(tab))
 
-
-                                else:
-                                        result["status"] = False
-                                        result["error"] = "Table not in the database"
-                        else:
-                                result["status"] = False
-                                result["error"] = "Database not in the Server"
-                else:
-                        result["status"] = False
-                        result["error"] = "Not database specified"
-        else:
-                result["status"] = False
-                result["error"] = "Connexion failed"
+                                
 
         # # Step 5: Return the response as JSON
         return jsonify(result) 
