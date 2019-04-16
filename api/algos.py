@@ -5,6 +5,7 @@ from Models import LinearRegression as LinReg
 import pickle
 from random import randint
 import pandas as  pd
+import petl as etl 
 
 
 advance_alogs = Blueprint('advance_alogs', __name__)
@@ -78,4 +79,30 @@ def join():
 
         # Step 5: Return the response as JSON
         return jsonify(score) 
+
+
+@advance_alogs.route('/v1/static', methods=['POST'])
+def staic():
+    if request.method == 'POST':
+        
+        result =[]
+        json_data = request.get_json()
+
+        link  = json_data['link']
+        fields = json_data['fields']
+
+
+        tab = etl.fromcsv(link) 
+        
+        for field in fields:
+                
+                stats = etl.stats(tab, field)
+                doc = dict(stats._asdict())
+                doc["field"] = field
+
+                result.append(doc)
+
+
+        # Step 5: Return the response as JSON
+        return jsonify(result) 
 
