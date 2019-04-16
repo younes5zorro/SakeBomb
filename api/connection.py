@@ -28,9 +28,9 @@ def connect_db():
         result = {}
         _PORT  = json_data['port']
         _HOST  = json_data['host']
-        _USER  = json_data['user']
-        _PASS  = json_data['pass']
-        _DATABASE  = json_data['database']
+        _USER  = json_data['username']
+        _PASS  = json_data['password']
+        _DATABASE  = json_data['db_name']
 
         
         engine = create_engine('mysql+pymysql://'+_USER+':'+_PASS+'@'+_HOST+':'+_PORT)
@@ -140,9 +140,9 @@ def data_db():
         result = {}
         _PORT  = json_data['port']
         _HOST  = json_data['host']
-        _USER  = json_data['user']
-        _PASS  = json_data['pass']
-        _DATABASE  = json_data['database']
+        _USER  = json_data['username']
+        _PASS  = json_data['password']
+        _DATABASE  = json_data['db_name']
         _TABLE  = json_data['table']
 
         engine = create_engine('mysql+pymysql://'+_USER+':'+_PASS+'@'+_HOST+':'+_PORT)
