@@ -27,20 +27,21 @@ def algos():
                         'algos_api_version': '1.1.1'})
 
 
-def get_dataFram():
+def get_dataFram(link):
         
-        dataFrame = pd.read_csv(UPLOAD_FOLDER / "flights.csv")
-        train_labels=dataFrame.iloc[:,-1]
+        tab = etl.fromcsv(link) 
+        df = etl.todataframe(tab)
+        train_labels=df.iloc[:,-1]
 
-        return dataFrame,train_labels
+        return df,train_labels
 
 
 @advance_alogs.route('/v1/regression', methods=['POST'])
-def join():
+def regression():
     if request.method == 'POST':
         
         json_data = request.get_json()
-
+        link  = json_data['link']
                 # "trainTestValidation" :{
                 # "test_size" :0.2,
                 # "validation_size" : 0.2
@@ -53,7 +54,7 @@ def join():
                 #         "n_jobs":null
                 # },
 
-        dataFrame,train_labels = get_dataFram()
+        dataFrame,train_labels = get_dataFram(link)
         model = LinReg
         trainTestValidation=json_data['trainTestValidation']
         X_train, y_train, X_val, y_val, X_test, y_test=model.splitData(dataFrame, trainTestValidation)
@@ -73,8 +74,10 @@ def join():
 
         predict_test,predict_val=model.testSetPrediction(X_test,X_val, clf)
         score=model.scoring(y_test,predict_test,y_val,predict_val,clf)
+        filename = "LinearRegression_"+str(randint(0, 3000))+".pkl"
 
-        filename = "LinearRegression_"+str(randint(0, 9))+".pkl"
+        score["filname"] = filename
+
         pickle.dump(clf, open(MODELS_FOLDER / filename , 'wb'))
 
         # Step 5: Return the response as JSON
@@ -82,7 +85,7 @@ def join():
 
 
 @advance_alogs.route('/v1/static', methods=['POST'])
-def staic():
+def get_static():
     if request.method == 'POST':
         
         result =[]
@@ -90,10 +93,7 @@ def staic():
 
         link  = json_data['link']
         fields = json_data['fields']
-
-
         tab = etl.fromcsv(link) 
-        
         for field in fields:
                 
                 stats = etl.stats(tab, field)
@@ -101,7 +101,6 @@ def staic():
                 doc["field"] = field
 
                 result.append(doc)
-
 
         # Step 5: Return the response as JSON
         return jsonify(result) 

@@ -126,8 +126,6 @@ def data_csv():
         result["header"]  = list(etl.header(tab))
 
         result["data"] = list(etl.dicts(tab))
-        result["status"] =  True
-
 
         # Step 5: Return the response as JSON
         return jsonify(result) 
