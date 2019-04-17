@@ -36,6 +36,75 @@ def get_dataFram(link):
 
         return df,train_labels
 
+def get_model(model_name):
+    model  = {}
+    if(model_name == 'DecisionTree') :
+        from Models import DecisionTree as DT
+        model=DT
+
+    if(model_name == 'RandomForestClassifier') :
+        from Models import randomForestClassifier as RFC
+        model=RFC
+
+    if(model_name == 'randomForestRegressor') :
+        from Models import randomForestRegressor as RFR
+        model=RFR
+
+    if(model_name == 'KMeans') :
+        from Models import KMeans as KM
+        model=KM
+
+    if(model_name == 'LinearRegression') :
+        from Models import LinearRegression as LinReg
+        model=LinReg
+
+    if(model_name == 'SVM') :
+        from Models import SVM as svm
+        model=svm
+
+    return model
+
+def get_score(json_data):
+
+        dataFrame,train_labels = get_dataFram(json_data["link"])
+        trainTestValidation=json_data['trainTestValidation']
+        model_name  = json_data["model_name"]
+        model = get_model(model_name)
+
+        X_train, y_train, X_val, y_val, X_test, y_test=model.splitData(dataFrame, trainTestValidation)
+
+        
+        if (json_data['Operation'] == "Default_Parameters"):
+                clf= model.TrainingDefaultParameters(X_train, y_train)
+
+        #Training of the model using parameters entered by the user
+        elif(json_data['Operation'] == "Fine_tuning"):
+                parameters=json_data['parameters']
+                clf= model.TrainingFine_tunning(X_train, y_train,parameters)
+
+        #Training of the model using autotuning
+        elif(json_data['Operation'] == "autotuning") :
+                clf= model.autotuning(X_train, y_train)
+
+        predict_test,predict_val=model.testSetPrediction(X_test,X_val, clf)
+        score=model.scoring(y_test,predict_test,y_val,predict_val,clf)
+        filename = model_name+"_"+str(randint(0, 3000))+".pkl"
+
+        score["filname"] = filename
+
+        pickle.dump(clf, open(MODELS_FOLDER / filename , 'wb'))
+
+        # Step 5: Return the response as JSON
+        return score
+
+@advance_alogs.route('/v1/test_algos', methods=['POST'])
+def test_algos():
+    if request.method == 'POST':
+        json_data = request.get_json()
+        
+        score = get_score(json_data)
+        return jsonify(score)
+        
 
 @advance_alogs.route('/v1/tree', methods=['POST'])
 def DecisionTree():

@@ -12,10 +12,10 @@ from sklearn.model_selection import train_test_split
 
 #--Metrics To Evaluate Machine Learning Algorithm:
 
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import mean_squared_error
+# from sklearn.metrics import accuracy_score
+from sklearn.metrics import mean_squared_error,r2_score
 
-from feature_selector import FeatureSelector
+# from feature_selector import FeatureSelector
 
 import json
 from Models import utils
@@ -83,49 +83,44 @@ def testSetPrediction(X_test,X_val,clf):
 #**************************Evaluation
 #____________________________________|
 
-def scoring(y_test,predict_test,y_val,predict_val):
+def scoring(y_test,predict_test,y_val,predict_val,clf):
 
     data={}
 
-    #data["accuracy_score_Test"] = accuracy_score(y_test,predict_test)
     data["mean_squared_error_Test"] = mean_squared_error(y_test,predict_test)
 
     #log_loss["roc_auc_score_Test"] = log_loss(y_test,predict)
+    data["variance_score_Test"] = r2_score(y_test,predict_test)
 
 
-    #data["accuracy_score_Val"] = accuracy_score(y_val,predict_val)
     data["mean_squared_error_Val"] = mean_squared_error(y_val,predict_val)
-    #print (data)
-    json_data = json.dumps(data)
-    utils.ensure_dir("output/predections")
-    file = open("output/predections/predictionRFR.json","w")
-    file.write(json_data)
-    file.close()
+    data["variance_score_Val"] = r2_score(y_val,predict_val)
+
     return data
 
-#--Variable Selection
+# #--Variable Selection
 
-def  feature_selector(dataFrame,train_labels):
+# def  feature_selector(dataFrame,train_labels):
 
-    fs = FeatureSelector(data = dataFrame, labels = train_labels)
-    fs.identify_missing(missing_threshold = 0.6)
+#     fs = FeatureSelector(data = dataFrame, labels = train_labels)
+#     fs.identify_missing(missing_threshold = 0.6)
 
-    '''This method finds pairs of collinear features based on the Pearson correlation coefficient.
-    For each pair above the specified threshold (in terms of absolute value),
-    it identifies one of the variables to be removed. '''
+#     '''This method finds pairs of collinear features based on the Pearson correlation coefficient.
+#     For each pair above the specified threshold (in terms of absolute value),
+#     it identifies one of the variables to be removed. '''
 
-    fs.identify_collinear(correlation_threshold = 0.98)
-    fs.identify_zero_importance(task = 'classification',
-                            eval_metric = 'auc',
-                            n_iterations = 10,
-                             early_stopping = True)
+#     fs.identify_collinear(correlation_threshold = 0.98)
+#     fs.identify_zero_importance(task = 'classification',
+#                             eval_metric = 'auc',
+#                             n_iterations = 10,
+#                              early_stopping = True)
 
-    # list of zero importance features
-    zero_importance_features = fs.ops['zero_importance']
+#     # list of zero importance features
+#     zero_importance_features = fs.ops['zero_importance']
 
-    #Once we have identified the features to remove: feature with missing values, feauture with low importance
-    train_no_missing_zero = fs.remove(methods = ['missing', 'zero_importance'])
+#     #Once we have identified the features to remove: feature with missing values, feauture with low importance
+#     train_no_missing_zero = fs.remove(methods = ['missing', 'zero_importance'])
 
-    all_to_remove = fs.check_removal()
+#     all_to_remove = fs.check_removal()
 
-    return train_no_missing_zero
+#     return train_no_missing_zero
