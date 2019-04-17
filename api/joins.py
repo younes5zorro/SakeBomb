@@ -66,7 +66,8 @@ def mapping(obj):
         elif(type == "mysql"):
                tab=  get_from_mysql(obj["cnx"])
         
-        tab  = etl.cat(tab, header=obj["header"])
+        if len(obj["header"]) > 0:
+               tab  = etl.cat(tab, header=obj["header"])
         return tab
 
 
