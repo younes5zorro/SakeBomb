@@ -97,7 +97,7 @@ def get_score(json_data):
         # Step 5: Return the response as JSON
         return score
 
-@advance_alogs.route('/v1/test_algos', methods=['POST'])
+@advance_alogs.route('/v1/train', methods=['POST'])
 def test_algos():
     if request.method == 'POST':
         json_data = request.get_json()
