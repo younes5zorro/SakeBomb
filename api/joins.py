@@ -1,6 +1,9 @@
 from flask import Blueprint, request, jsonify
 import petl as etl 
 from sqlalchemy import create_engine
+import openpyxl
+from io import BytesIO
+import requests
 
 advance_join = Blueprint('advance_join', __name__)
 
@@ -55,12 +58,16 @@ def get_from_mysql(cnx):
 
 def mapping(obj):
         type = obj["type"]
+        tab  ={}
         if(type =="excel"):
-               return get_from_excel(obj["cnx"])
+               tab =  get_from_excel(obj["cnx"])
         elif(type == "csv"):
-               return get_from_csv(obj["cnx"])
+               tab =  get_from_csv(obj["cnx"])
         elif(type == "mysql"):
-               return get_from_mysql(obj["cnx"])
+               tab=  get_from_mysql(obj["cnx"])
+        
+        tab  = etl.cat(tab, header=obj["header"])
+        return tab
 
 
 def join_table(type,tab_L,tab_R,key_L,key_R):
@@ -110,7 +117,6 @@ def join():
        key_L = json_data[0]["key"]
        tab_R = mapping(json_data[1])
        key_R = json_data[1]["key"]
-
        type_join = json_data[0]["join"]
 
        tab  = join_table(type_join,tab_L,tab_R,key_L,key_R)
