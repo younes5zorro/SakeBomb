@@ -3,7 +3,7 @@
 __author__ = "EA"
 # -*- coding: utf-8 -*-
 
-from feature_selector import FeatureSelector
+# from feature_selector import FeatureSelector
 
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier
@@ -15,10 +15,10 @@ from sklearn.metrics import log_loss
 from sklearn.model_selection import GridSearchCV
 
 #Tree visualization library
-from sklearn.externals.six import StringIO
-from IPython.display import Image
-from sklearn.tree import export_graphviz
-import pydotplus
+# from sklearn.externals.six import StringIO
+# from IPython.display import Image
+# from sklearn.tree import export_graphviz
+# import pydotplus
 import json
 from Models import utils
 
@@ -87,60 +87,52 @@ def testSetPrediction(X_test,X_val,clf):
 
 #**************************Evaluation
 #____________________________________|
-def scoring(y_test,predict_test,y_val,predict_val):
+def scoring(y_test,predict_test,y_val,predict_val,clf):
 
     data={}
 
     data["accuracy_score_Test"] = accuracy_score(y_test,predict_test)
-    #log_loss["roc_auc_score_Test"] = log_loss(y_test,predict)
+    data["roc_auc_score_Test"] = log_loss(y_test,predict_test)
 
 
     data["accuracy_score_Val"] = accuracy_score(y_val,predict_val)
     #print (data)
 
-    json_data = json.dumps(data)
-
-    utils.ensure_dir("output/predections")
-
-
-    file = open("output/predections/predictionDT.json","w")
-    file.write(json_data)
-    file.close()
     return data
 
-#Variable Selection
-def  feature_selector(dataFrame,train_labels):
+# #Variable Selection
+# def  feature_selector(dataFrame,train_labels):
 
-    fs = FeatureSelector(data = dataFrame, labels = train_labels)
-    fs.identify_missing(missing_threshold = 0.6)
+#     fs = FeatureSelector(data = dataFrame, labels = train_labels)
+#     fs.identify_missing(missing_threshold = 0.6)
 
-    '''This method finds pairs of collinear features based on the Pearson correlation coefficient.
-    For each pair above the specified threshold (in terms of absolute value),
-    it identifies one of the variables to be removed. '''
+#     '''This method finds pairs of collinear features based on the Pearson correlation coefficient.
+#     For each pair above the specified threshold (in terms of absolute value),
+#     it identifies one of the variables to be removed. '''
 
-    fs.identify_collinear(correlation_threshold = 0.98)
-    fs.identify_zero_importance(task = 'regression',
-                            eval_metric = 'auc',
-                            n_iterations = 10,
-                             early_stopping = True)
+#     fs.identify_collinear(correlation_threshold = 0.98)
+#     fs.identify_zero_importance(task = 'regression',
+#                             eval_metric = 'auc',
+#                             n_iterations = 10,
+#                              early_stopping = True)
 
-    # list of zero importance features
-    zero_importance_features = fs.ops['zero_importance']
+#     # list of zero importance features
+#     zero_importance_features = fs.ops['zero_importance']
 
-    #we have identified the features to remove: feature with missing values, feauture with low importance
-    train_no_missing_zero = fs.remove(methods = ['missing', 'zero_importance'])
+#     #we have identified the features to remove: feature with missing values, feauture with low importance
+#     train_no_missing_zero = fs.remove(methods = ['missing', 'zero_importance'])
 
-    all_to_remove = fs.check_removal()
+#     all_to_remove = fs.check_removal()
 
-    return train_no_missing_zero
+#     return train_no_missing_zero
 
-def visualization(dtree):
-    dot_data = StringIO()
-    export_graphviz(dtree, out_file=dot_data,
-                    filled=True, rounded=True,
-                    special_characters=True)
-    graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
-    image=Image(graph.create_png())
-    utils.ensure_dir("output/visualisation")
-    Image(graph.write_png('output/visualisation/Tree_visu.png'))
-    return image
+# def visualization(dtree):
+#     dot_data = StringIO()
+#     export_graphviz(dtree, out_file=dot_data,
+#                     filled=True, rounded=True,
+#                     special_characters=True)
+#     graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+#     image=Image(graph.create_png())
+#     utils.ensure_dir("output/visualisation")
+#     Image(graph.write_png('output/visualisation/Tree_visu.png'))
+#     return image
