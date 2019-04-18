@@ -39,14 +39,13 @@ def get_from_mysql(cnx):
 
         _PORT  = cnx['port']
         _HOST  = cnx['host']
-        _USER  = cnx['user']
-        _PASS  = cnx['pass']
-        _DATABASE  = cnx['database']
+        _USER  = cnx['username']
+        _PASS  = cnx['password']
+        _DATABASE  = cnx['db_name']
         _TABLE  = cnx['table']
 
         engine = create_engine('mysql+pymysql://'+_USER+':'+_PASS+'@'+_HOST+':'+_PORT)
 
-        engine.connect().execute("USE "+_DATABASE +" ;")
 
         rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE)
 
@@ -74,7 +73,7 @@ def mapping(obj):
 def join_table(type,tab_L,tab_R,key_L,key_R):
         if(type =="join"):
         # equi-join
-               return etl.join(tab_L,tab_R,lkey=key_L,rkey=key_R)
+              return etl.join(tab_L,tab_R,lkey=key_L,rkey=key_R)
         elif(type == "leftjoin"):
         # left outer join
                return etl.leftjoin(tab_L,tab_R,lkey=key_L,rkey=key_R)
@@ -115,13 +114,13 @@ def join():
        result = {}
 
        tab_L = mapping(json_data[0])
+       
        key_L = json_data[0]["key"]
        tab_R = mapping(json_data[1])
        key_R = json_data[1]["key"]
        type_join = json_data[0]["join"]
 
        tab  = join_table(type_join,tab_L,tab_R,key_L,key_R)
-
        df = etl.todataframe(tab)
 
        result["data"] = list(etl.dicts(tab))
