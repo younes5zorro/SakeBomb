@@ -7,7 +7,8 @@ import pickle
 from random import randint
 import pandas as  pd
 import petl as etl 
-
+import shutil
+ 
 
 advance_alogs = Blueprint('advance_alogs', __name__)
 
@@ -27,6 +28,11 @@ def algos():
         return jsonify({'algos_version': '0.0.0',
                         'algos_api_version': '1.1.1'})
 
+@advance_alogs.route('/v1/clear', methods=['GET'])
+def clear():
+        shutil.rmtree(MODELS_FOLDER)
+        MODELS_FOLDER.mkdir(exist_ok=True)
+        return jsonify({"message":" removed"})
 
 def get_dataFram(link):
         
