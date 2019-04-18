@@ -6,7 +6,7 @@ def create_app() -> Flask:
     """Create a flask app instance."""
 
     flask_app = Flask('advance_api')
-
+    flask_app.config['JSON_SORT_KEYS'] = False
     # import blueprints
     from api.connection import advance_app
     from api.algos import advance_alogs

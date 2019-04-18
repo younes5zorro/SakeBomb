@@ -121,6 +121,8 @@ def join():
        type_join = json_data[0]["join"]
 
        tab  = join_table(type_join,tab_L,tab_R,key_L,key_R)
+       tab = etl.movefield(tab,key_L,0)
+
        df = etl.todataframe(tab)
 
        result["data"] = list(etl.dicts(tab))
