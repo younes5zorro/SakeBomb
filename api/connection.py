@@ -148,7 +148,7 @@ def data_db():
         engine = create_engine('mysql+pymysql://'+_USER+':'+_PASS+'@'+_HOST+':'+_PORT)
 
 
-        rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE +' LIMIT 10')
+        rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE)
 
         data =[dict(row) for row in rows]
 

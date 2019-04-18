@@ -48,7 +48,7 @@ def get_from_mysql(cnx):
 
         engine.connect().execute("USE "+_DATABASE +" ;")
 
-        rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE +' LIMIT 100')
+        rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE)
 
         data =[dict(row) for row in rows]
 
