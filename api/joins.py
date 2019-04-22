@@ -46,7 +46,6 @@ def get_from_mysql(cnx):
 
         engine = create_engine('mysql+pymysql://'+_USER+':'+_PASS+'@'+_HOST+':'+_PORT)
 
-
         rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE)
 
         data =[dict(row) for row in rows]
@@ -134,9 +133,9 @@ def join():
               if df[var].dtypes=='O':
                      result["categorical"].append(var)
               else:
-                     if len(df[var].unique())<20:
-                            result["categorical"].append(var)
-                     else:
+                     # if len(df[var].unique())<20:
+                     #        result["categorical"].append(var)
+                     # else:
                             result["numerical"].append(var)
 
 

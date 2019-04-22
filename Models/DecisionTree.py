@@ -93,9 +93,20 @@ def scoring(y_test,predict_test,y_val,predict_val,clf):
 
     data["accuracy_score_Test"] = accuracy_score(y_test,predict_test)
     data["roc_auc_score_Test"] = log_loss(y_test,predict_test)
-
-
+    if data["accuracy_score_Test"] >= 0.8:
+            data["Etat_Test"] = "Excellent"
+    elif data["accuracy_score_Test"] >= 0.6:
+            data["Etat_Test"] = "Moyen"
+    else :
+            data["Etat_Test"] = "Mauvais"    
     data["accuracy_score_Val"] = accuracy_score(y_val,predict_val)
+
+    if data["accuracy_score_Val"] >= 0.8:
+            data["Etat_Val"] = "Excellent"
+    elif data["accuracy_score_Val"] >= 0.6:
+            data["Etat_Val"] = "Moyen"
+    else :
+            data["Etat_Val"] = "Mauvais"    
     #print (data)
 
     return data

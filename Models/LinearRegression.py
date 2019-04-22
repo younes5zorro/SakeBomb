@@ -81,10 +81,22 @@ def scoring(y_test,predict_test,y_val,predict_val,clf):
     data["mean_squared_error_Test"] = mean_squared_error(y_test,predict_test)
     data["variance_score_Test"] = r2_score(y_test,predict_test)
 
+    if data["variance_score_Test"] >= 0.8:
+            data["Etat_Test"] = "Excellent"
+    elif data["variance_score_Test"] >= 0.6:
+            data["Etat_Test"] = "Moyen"
+    else :
+            data["Etat_Test"] = "Mauvais" 
 
     data["mean_squared_error_Val"] = mean_squared_error(y_val,predict_val)
     data["variance_score_Val"] = r2_score(y_val,predict_val)
 
+    if data["variance_score_Val"] >= 0.8:
+            data["Etat_Val"] = "Excellent"
+    elif data["variance_score_Val"] >= 0.6:
+            data["Etat_Val"] = "Moyen"
+    else :
+            data["Etat_Val"] = "Mauvais" 
 
     data["Coefficients"]=list(clf.coef_)
     data["Intercept"] = clf.intercept_
