@@ -142,3 +142,19 @@ def join():
         # Step 5: Return the response as JSON
        return jsonify(result) 
 
+     
+# @advance_join.route('/v1/impute', methods=['POST'])
+# def join():
+#     if request.method == 'POST':
+        
+#        json_data = request.get_json()
+#        tab  = etl.fromdicts(json_data["data"])
+
+#        df = pd.read_excel("heartPTD.xlsx")
+#        imp = impyte.Impyter(df)
+
+#        result = imp.impute(estimator='knn', threshold={"r2": None, "f1_macro": .7})
+
+#         # Step 5: Return the response as JSON
+#        return jsonify(result) 
+

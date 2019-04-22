@@ -69,6 +69,10 @@ def get_model(model_name):
         from Models import SVM as svm
         model=svm
 
+    if(model_name == 'DecisionTreeRegressor') :
+        from Models import DecisionTreeRegressor as DTReg
+        model=DTReg
+
     return model
 
 def get_score(json_data):
