@@ -5,6 +5,9 @@ import openpyxl
 from io import BytesIO
 import requests
 
+import pandas as pd
+import numpy as np
+
 advance_join = Blueprint('advance_join', __name__)
 
 
@@ -21,10 +24,12 @@ def get_from_excel(cnx):
         file = requests.get(link).content
         
       
-        result = {}
-        excel_file = openpyxl.load_workbook(filename=BytesIO(file))
-
-        tab = etl.fromxlsx(filename=BytesIO(file),sheet =sheet)
+       #  result = {}
+       #  excel_file = openpyxl.load_workbook(filename=BytesIO(file))
+        df =pd.read_excel(BytesIO(file),sheet_name =sheet)
+        df = df.replace(np.nan, '', regex=True)
+        tab = etl.fromdataframe(df)
+       #  tab = etl.fromxlsx(filename=BytesIO(file),sheet =sheet)
         return tab
 
 def get_from_csv(cnx):
@@ -121,7 +126,6 @@ def join():
 
        tab  = join_table(type_join,tab_L,tab_R,key_L,key_R)
        tab = etl.movefield(tab,key_L,0)
-
        df = etl.todataframe(tab)
 
        result["data"] = list(etl.dicts(tab))
