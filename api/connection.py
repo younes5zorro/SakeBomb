@@ -103,11 +103,30 @@ def data_excel():
                 result["header"] = list(etl.header(tab))
                 result["data"] =  list(etl.dicts(tab))
 
+                df = etl.todataframe(tab)
+
+                result["categorical"] = []
+                result["numerical"] = []
+                
+                for var in df.columns:
+
+                        if df[var].dtypes=='O':
+                                result["categorical"].append(var)
+                        else:
+                                # if len(df[var].unique())<20:
+                                #        result["categorical"].append(var)
+                                # else:
+                                        result["numerical"].append(var)
+
+
         else:
                 result["sheet_name"] = sheet
                 result["header"] = []
                 result["data"] =  []
-               
+                result["categorical"] = []
+                result["numerical"] = []
+        
+
         # Step 5: Return the response as JSON
         return jsonify(result) 
 
