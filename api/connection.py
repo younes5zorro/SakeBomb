@@ -93,9 +93,7 @@ def data_excel():
 
         file = requests.get(link).content
         
-      
         result = {}
-        # excel_file = openpyxl.load_workbook(filename=BytesIO(file))
 
         df =pd.read_excel(BytesIO(file),sheet_name =sheet)
         df = df.replace(np.nan, '', regex=True)
@@ -104,8 +102,6 @@ def data_excel():
                 result["sheet_name"] = sheet
                 result["header"] = list(etl.header(tab))
                 result["data"] =  list(etl.dicts(tab))
-
-                # df = etl.todataframe(tab)
 
                 result["categorical"] = []
                 result["numerical"] = []
@@ -119,8 +115,6 @@ def data_excel():
                                 #        result["categorical"].append(var)
                                 # else:
                                         result["numerical"].append(var)
-
-
         else:
                 result["sheet_name"] = sheet
                 result["header"] = []
@@ -128,60 +122,8 @@ def data_excel():
                 result["categorical"] = []
                 result["numerical"] = []
         
-
         # Step 5: Return the response as JSON
         return jsonify(result) 
-
-
-
-# @advance_app.route('/v1/data/file/excel', methods=['POST'])
-# def data_excel():
-#     if request.method == 'POST':
-        
-#         json_data = request.get_json()
-#         link  = json_data['link']
-#         sheet  = json_data['sheet']
-
-#         file = requests.get(link).content
-        
-      
-#         result = {}
-#         excel_file = openpyxl.load_workbook(filename=BytesIO(file))
-
-      
-#         tab = etl.fromxlsx(filename=BytesIO(file),sheet =sheet)
-#         if tab:
-#                 result["sheet_name"] = sheet
-#                 result["header"] = list(etl.header(tab))
-#                 result["data"] =  list(etl.dicts(tab))
-
-#                 df = etl.todataframe(tab)
-
-#                 result["categorical"] = []
-#                 result["numerical"] = []
-                
-#                 for var in df.columns:
-
-#                         if df[var].dtypes=='O':
-#                                 result["categorical"].append(var)
-#                         else:
-#                                 # if len(df[var].unique())<20:
-#                                 #        result["categorical"].append(var)
-#                                 # else:
-#                                         result["numerical"].append(var)
-
-
-#         else:
-#                 result["sheet_name"] = sheet
-#                 result["header"] = []
-#                 result["data"] =  []
-#                 result["categorical"] = []
-#                 result["numerical"] = []
-        
-
-#         # Step 5: Return the response as JSON
-#         return jsonify(result) 
-
 
 @advance_app.route('/v1/data/file/csv', methods=['POST'])
 def data_csv():
@@ -217,7 +159,6 @@ def data_db():
 
         engine = create_engine('mysql+pymysql://'+_USER+':'+_PASS+'@'+_HOST+':'+_PORT)
 
-
         rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE)
 
         data =[dict(row) for row in rows]
@@ -227,31 +168,6 @@ def data_db():
         result["header"] = list(etl.header(tab))
         result["data"] = list(etl.dicts(tab))
 
-                                
-
         # # Step 5: Return the response as JSON
         return jsonify(result) 
 
-
-# @advance_app.route('/v1/predict/regression', methods=['POST'])
-# def predict():
-#     if request.method == 'POST':
-#         # Step 1: Extract POST data from request body as JSON
-#         json_data = request.get_json()
-#         _logger.debug(f'Inputs: {json_data}')
-
-#         # Step 2: Validate the input using marshmallow schema
-#         input_data, errors = validate_inputs(input_data=json_data)
-
-#         # Step 3: Model prediction
-#         result = make_prediction(input_data=input_data)
-#         _logger.debug(f'Outputs: {result}')
-
-#         # Step 4: Convert numpy ndarray to list
-#         predictions = result.get('predictions').tolist()
-#         version = result.get('version')
-
-#         # Step 5: Return the response as JSON
-#         return jsonify({'predictions': predictions,
-#                         'version': version,
-#                         'errors': errors})

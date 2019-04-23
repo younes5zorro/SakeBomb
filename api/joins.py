@@ -23,9 +23,6 @@ def get_from_excel(cnx):
 
         file = requests.get(link).content
         
-      
-       #  result = {}
-       #  excel_file = openpyxl.load_workbook(filename=BytesIO(file))
         df =pd.read_excel(BytesIO(file),sheet_name =sheet)
         df = df.replace(np.nan, '', regex=True)
         tab = etl.fromdataframe(df)
@@ -148,7 +145,7 @@ def join():
 
      
 # @advance_join.route('/v1/impute', methods=['POST'])
-# def join():
+# def impute():
 #     if request.method == 'POST':
         
 #        json_data = request.get_json()
