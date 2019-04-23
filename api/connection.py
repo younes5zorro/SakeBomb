@@ -3,7 +3,8 @@ from sqlalchemy import create_engine
 import openpyxl
 
 import requests
-
+import pandas as pd
+import numpy as np
 from io import BytesIO
 import petl as etl 
 import json
@@ -94,16 +95,17 @@ def data_excel():
         
       
         result = {}
-        excel_file = openpyxl.load_workbook(filename=BytesIO(file))
+        # excel_file = openpyxl.load_workbook(filename=BytesIO(file))
 
-      
-        tab = etl.fromxlsx(filename=BytesIO(file),sheet =sheet)
+        df =pd.read_excel(BytesIO(file),sheet_name =sheet)
+        df = df.replace(np.nan, '', regex=True)
+        tab = etl.fromdataframe(df)
         if tab:
                 result["sheet_name"] = sheet
                 result["header"] = list(etl.header(tab))
                 result["data"] =  list(etl.dicts(tab))
 
-                df = etl.todataframe(tab)
+                # df = etl.todataframe(tab)
 
                 result["categorical"] = []
                 result["numerical"] = []
@@ -130,6 +132,55 @@ def data_excel():
         # Step 5: Return the response as JSON
         return jsonify(result) 
 
+
+
+# @advance_app.route('/v1/data/file/excel', methods=['POST'])
+# def data_excel():
+#     if request.method == 'POST':
+        
+#         json_data = request.get_json()
+#         link  = json_data['link']
+#         sheet  = json_data['sheet']
+
+#         file = requests.get(link).content
+        
+      
+#         result = {}
+#         excel_file = openpyxl.load_workbook(filename=BytesIO(file))
+
+      
+#         tab = etl.fromxlsx(filename=BytesIO(file),sheet =sheet)
+#         if tab:
+#                 result["sheet_name"] = sheet
+#                 result["header"] = list(etl.header(tab))
+#                 result["data"] =  list(etl.dicts(tab))
+
+#                 df = etl.todataframe(tab)
+
+#                 result["categorical"] = []
+#                 result["numerical"] = []
+                
+#                 for var in df.columns:
+
+#                         if df[var].dtypes=='O':
+#                                 result["categorical"].append(var)
+#                         else:
+#                                 # if len(df[var].unique())<20:
+#                                 #        result["categorical"].append(var)
+#                                 # else:
+#                                         result["numerical"].append(var)
+
+
+#         else:
+#                 result["sheet_name"] = sheet
+#                 result["header"] = []
+#                 result["data"] =  []
+#                 result["categorical"] = []
+#                 result["numerical"] = []
+        
+
+#         # Step 5: Return the response as JSON
+#         return jsonify(result) 
 
 
 @advance_app.route('/v1/data/file/csv', methods=['POST'])
