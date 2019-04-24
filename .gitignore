@@ -3,5 +3,4 @@ uploads/
 __pycache__
 */__pycache__
 .vscode/
-saved/
 test.py

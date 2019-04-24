@@ -139,39 +139,45 @@ def predict():
         model_name  = json_data["model_name"]
         link  = json_data["link"]
 
-        files = [x.name for x in MODELS_FOLDER.glob('*') if x.is_file() if  len(x.name.split('~~'))> 1 and x.name.split('~~')[2]==model_name+'.pkl']
+        files = [x.name for x in MODELS_FOLDER.glob('*') if x.is_file() and  len(x.name.split('~~'))> 1 and x.name.split('~~')[2]==model_name+'.pkl']
 
         loaded_model = joblib.load(MODELS_FOLDER / files[0])
 
-        tab = etl.fromcsv(link) 
-        df = etl.todataframe(tab)
+        df,train_labels = get_dataFram(json_data["link"])
         pred_cols = list(df.columns.values)[:-1]
         # pred_cols = list(pr.columns.values)
 
         # apply the whole pipeline to data
         pred = list(pd.Series(loaded_model.predict(df[pred_cols])))
 
-        return jsonify(pred)
+        di ={0:"dissatisfied",1:"satisfied"}
 
-# @advance_alogs.route('/v1/compare', methods=['POST'])
-# def compare():
-#     if request.method == 'POST':
-#         json_data = request.get_json()
-#         models  = json_data["models"]
+        pred =  list(map(di.get, pred))
 
-#         files = [x.name for x in MODELS_FOLDER.glob('*') if x.is_file() if  len(x.name.split('~~'))> 1 and x.name.split('~~')[2]==model_name+'.pkl']
+        df[list(df.columns)[-1]] = pred
 
-#         loaded_model = joblib.load(MODELS_FOLDER / files[0])
+        return jsonify(df.to_dict('records'))
 
-#         tab = etl.fromcsv(link) 
-#         df = etl.todataframe(tab)
-#         pred_cols = list(df.columns.values)[:-1]
-#         # pred_cols = list(pr.columns.values)
+@advance_alogs.route('/v1/compare', methods=['POST'])
+def compare():
+    if request.method == 'POST':
+        json_data = request.get_json()
+        models  = json_data["models"]
 
-#         # apply the whole pipeline to data
-#         pred = list(pd.Series(loaded_model.predict(df[pred_cols])))
+        result = []
+        for model_name in models:
+                doc = {}
+                doc["model"] = model_name
+                files = [x.name for x in MODELS_FOLDER.glob('*') if x.is_file() if  len(x.name.split('~~'))> 1 and x.name.split('~~')[2]==model_name+'.pkl']
+                file = files[0]
+                split = file.split('~~')
+                doc["Accuracy Trainning"] = split[0]
+                doc["Accuracy Validation"] = split[1]
 
-#         return jsonify(pred)
+                result.append(doc)
+                
+
+        return jsonify(result)
 
 @advance_alogs.route('/v1/static', methods=['POST'])
 def get_static():
