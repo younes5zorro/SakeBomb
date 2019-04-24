@@ -7,6 +7,10 @@ import petl as etl
 import shutil
  
 from sklearn.externals import joblib
+from io import BytesIO
+import requests
+
+import pandas as pd
 
 advance_alogs = Blueprint('advance_alogs', __name__)
 
@@ -33,40 +37,44 @@ def clear():
         return jsonify({"message":" removed"})
 
 def get_dataFram(link):
+
+        file = requests.get(link).content
         
-        tab = etl.fromcsv(link) 
-        df = etl.todataframe(tab)
+        df =pd.read_csv(BytesIO(file))
+
+        # tab = etl.fromcsv(link) 
+        # df = etl.todataframe(tab)
         train_labels=df.iloc[:,-1]
 
         return df,train_labels
 
 def get_model(model_name):
     model  = {}
-    if(model_name == 'DecisionTree') :
+    if(model_name == "Arbre de decision") :
         from Models import DecisionTree as DT
         model=DT
 
-    if(model_name == 'RandomForestClassifier') :
+    if(model_name == "Random Forest") :
         from Models import randomForestClassifier as RFC
         model=RFC
 
-    if(model_name == 'randomForestRegressor') :
+    if(model_name == "Random Forest Regression") :
         from Models import randomForestRegressor as RFR
         model=RFR
 
-    if(model_name == 'KMeans') :
+    if(model_name == "Kmeans") :
         from Models import KMeans as KM
         model=KM
 
-    if(model_name == 'LinearRegression') :
+    if(model_name =="Régression Liniaire") :
         from Models import LinearRegression as LinReg
         model=LinReg
 
-    if(model_name == 'SVM') :
+    if(model_name == "SVM") :
         from Models import SVM as svm
         model=svm
 
-    if(model_name == 'DecisionTreeRegressor') :
+    if(model_name == "Decision tree regression") :
         from Models import DecisionTreeRegressor as DTReg
         model=DTReg
 
@@ -80,8 +88,8 @@ def get_score(json_data):
         model_type  = json_data["model_type"]
         model = get_model(model_type)
 
-        if(json_data['Feautue_Selection'] == True ):
-                 dataFrame=model.feature_selector(dataFrame, train_labels)
+        # if(json_data['Feautue_Selection'] == True ):
+        #          dataFrame=model.feature_selector(dataFrame, train_labels)
 
         X_train, y_train, X_val, y_val, X_test, y_test=model.splitData(dataFrame, trainTestValidation)
 
@@ -100,10 +108,15 @@ def get_score(json_data):
 
         predict_test,predict_val=model.testSetPrediction(X_test,X_val, clf)
         score=model.scoring(y_test,predict_test,y_val,predict_val,clf)
-        filename = model_name+".pkl"
+
+        filename = str(score["Accuracy Trainning"])+"~~"+str(score["Accuracy Validation"])+"~~"+model_name+".pkl"
         # filename = model_name+"_"+str(randint(0, 3000))+".pkl"
 
-        score["filname"] = filename
+        score["Model"] = model_name
+
+        if model_type =="Régression Liniaire" :
+                score["x"]=X_test.reshape(1,X_test.shape[0])[0].tolist()
+                score["y"]=y_test.tolist()
 
         joblib.dump(clf, MODELS_FOLDER / filename)
         # pickle.dump(clf, open(MODELS_FOLDER / filename , 'wb'))
@@ -123,10 +136,12 @@ def train_model():
 def predict():
     if request.method == 'POST':
         json_data = request.get_json()
-        model_name  = json_data["model_name"]+".pkl"
+        model_name  = json_data["model_name"]
         link  = json_data["link"]
 
-        loaded_model = joblib.load(MODELS_FOLDER / model_name)
+        files = [x.name for x in MODELS_FOLDER.glob('*') if x.is_file() if  len(x.name.split('~~'))> 1 and x.name.split('~~')[2]==model_name+'.pkl']
+
+        loaded_model = joblib.load(MODELS_FOLDER / files[0])
 
         tab = etl.fromcsv(link) 
         df = etl.todataframe(tab)
@@ -137,6 +152,26 @@ def predict():
         pred = list(pd.Series(loaded_model.predict(df[pred_cols])))
 
         return jsonify(pred)
+
+# @advance_alogs.route('/v1/compare', methods=['POST'])
+# def compare():
+#     if request.method == 'POST':
+#         json_data = request.get_json()
+#         models  = json_data["models"]
+
+#         files = [x.name for x in MODELS_FOLDER.glob('*') if x.is_file() if  len(x.name.split('~~'))> 1 and x.name.split('~~')[2]==model_name+'.pkl']
+
+#         loaded_model = joblib.load(MODELS_FOLDER / files[0])
+
+#         tab = etl.fromcsv(link) 
+#         df = etl.todataframe(tab)
+#         pred_cols = list(df.columns.values)[:-1]
+#         # pred_cols = list(pr.columns.values)
+
+#         # apply the whole pipeline to data
+#         pred = list(pd.Series(loaded_model.predict(df[pred_cols])))
+
+#         return jsonify(pred)
 
 @advance_alogs.route('/v1/static', methods=['POST'])
 def get_static():

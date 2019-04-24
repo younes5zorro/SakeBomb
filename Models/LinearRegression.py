@@ -78,28 +78,27 @@ def scoring(y_test,predict_test,y_val,predict_val,clf):
     data={}
 
 
-    data["mean_squared_error_Test"] = mean_squared_error(y_test,predict_test)
-    data["variance_score_Test"] = r2_score(y_test,predict_test)
-
-    if data["variance_score_Test"] >= 0.8:
-            data["Etat_Test"] = "Excellent"
-    elif data["variance_score_Test"] >= 0.6:
-            data["Etat_Test"] = "Moyen"
+    data["Model"]  =""    
+    data["Status"]  ="Train/validation"
+    data["Accuracy Trainning"] = round(r2_score(y_test,predict_test),2)
+    if data["Accuracy Trainning"] >= 0.8:
+            data["Etat Trainning"] = "Excellent"
+    elif data["Accuracy Trainning"] >= 0.6:
+            data["Etat Trainning"] = "Moyen"
     else :
-            data["Etat_Test"] = "Mauvais" 
+            data["Etat Trainning"] = "Mauvais"  
 
-    data["mean_squared_error_Val"] = mean_squared_error(y_val,predict_val)
-    data["variance_score_Val"] = r2_score(y_val,predict_val)
+    data["Accuracy Validation"] =  round(r2_score(y_val,predict_val),2)
 
-    if data["variance_score_Val"] >= 0.8:
-            data["Etat_Val"] = "Excellent"
-    elif data["variance_score_Val"] >= 0.6:
-            data["Etat_Val"] = "Moyen"
+    if data["Accuracy Validation"] >= 0.8:
+            data["Etat Validation"] = "Excellent"
+    elif data["Accuracy Validation"] >= 0.6:
+            data["Etat Validation"] = "Moyen"
     else :
-            data["Etat_Val"] = "Mauvais" 
+            data["Etat Validation"] = "Mauvais"    
 
-    data["Coefficients"]=list(clf.coef_)
-    data["Intercept"] = clf.intercept_
+    data["a"]=list(clf.coef_)
+    data["b"] = clf.intercept_
 
     return data
 

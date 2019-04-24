@@ -93,22 +93,26 @@ def scoring(y_test,predict_test,y_val,predict_val,clf):
 
     data={}
 
-    data["accuracy_score_Test"] = accuracy_score(y_test,predict_test)
-    data["roc_auc_score_Test"] = log_loss(y_test,predict_test)
-    if data["accuracy_score_Test"] >= 0.8:
-            data["Etat_Test"] = "Excellent"
-    elif data["accuracy_score_Test"] >= 0.6:
-            data["Etat_Test"] = "Moyen"
+#     data["accuracy_score_Test"] = accuracy_score(y_test,predict_test)
+#     data["roc_auc_score_Test"] = log_loss(y_test,predict_test)
+    data["Model"]  =""    
+    data["Status"]  ="Train/validation"
+    data["Accuracy Trainning"] = round(accuracy_score(y_test,predict_test),2)
+    if data["Accuracy Trainning"] >= 0.8:
+            data["Etat Trainning"] = "Excellent"
+    elif data["Accuracy Trainning"] >= 0.6:
+            data["Etat Trainning"] = "Moyen"
     else :
-            data["Etat_Test"] = "Mauvais"    
-    data["accuracy_score_Val"] = accuracy_score(y_val,predict_val)
+            data["Etat Trainning"] = "Mauvais"  
 
-    if data["accuracy_score_Val"] >= 0.8:
-            data["Etat_Val"] = "Excellent"
-    elif data["accuracy_score_Val"] >= 0.6:
-            data["Etat_Val"] = "Moyen"
+    data["Accuracy Validation"] =  round(accuracy_score(y_val,predict_val),2)
+
+    if data["Accuracy Validation"] >= 0.8:
+            data["Etat Validation"] = "Excellent"
+    elif data["Accuracy Validation"] >= 0.6:
+            data["Etat Validation"] = "Moyen"
     else :
-            data["Etat_Val"] = "Mauvais"    
+            data["Etat Validation"] = "Mauvais"    
     #print (data)
 
     return data
