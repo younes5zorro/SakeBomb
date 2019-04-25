@@ -30,6 +30,25 @@ def algos():
         return jsonify({'algos_version': '0.0.0',
                         'algos_api_version': '1.1.1'})
 
+
+@advance_alogs.route('/v1/delete_model', methods=['POST'])
+def delete_model():
+        if request.method == 'POST':
+                json_data = request.get_json()
+
+                model_name = json_data["model_name"]        
+                fil = [x.unlink() for x in MODELS_FOLDER.glob('*') if x.is_file() and x.name.split('~~')[2]==model_name+'.pkl']
+                
+                return jsonify({"message":model_name + " removed"})
+
+
+@advance_alogs.route('/v1/list_models', methods=['GET'])
+def list_models():
+       
+        files = [x.name.replace(".pkl","").split('~~')[2] for x in MODELS_FOLDER.glob('*') if x.is_file()]
+
+        return jsonify(files)
+
 @advance_alogs.route('/v1/clear', methods=['GET'])
 def clear():
         shutil.rmtree(MODELS_FOLDER)
@@ -148,7 +167,7 @@ def predict():
         model_name  = json_data["model_name"]
         link  = json_data["link"]
 
-        files = [x.name for x in MODELS_FOLDER.glob('*') if x.is_file() and  len(x.name.split('~~'))> 1 and x.name.split('~~')[2]==model_name+'.pkl']
+        files = [x.name for x in MODELS_FOLDER.glob('*') if x.is_file() and x.name.split('~~')[2]==model_name+'.pkl']
 
         loaded_model = joblib.load(MODELS_FOLDER / files[0])
 
