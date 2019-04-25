@@ -30,3 +30,4 @@ Werkzeug==0.15.2
 lightgbm==2.2.3
 xlrd==1.2.0
 # impyte==0.1.0
+xgboost==0.82

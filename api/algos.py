@@ -82,6 +82,10 @@ def get_model(model_name):
         from Models import LogisticRegression as LogReg
         model=LogReg
 
+    if(model_name == "xgboost classification") :
+        from Models import XGBClassifier as XgbC
+        model=XgbC
+
     return model
 
 def get_score(json_data):
@@ -153,7 +157,7 @@ def predict():
         # pred_cols = list(pr.columns.values)
 
         # apply the whole pipeline to data
-        pred = list(pd.Series(loaded_model.predict(df[pred_cols])))
+        pred = list(pd.Series(loaded_model.predict(df[pred_cols].values)))
 
         di ={0:"dissatisfied",1:"satisfied"}
 
