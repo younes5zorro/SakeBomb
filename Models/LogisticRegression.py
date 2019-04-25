@@ -1,4 +1,4 @@
-#     **************LinReg: LinearRegression************     /
+#     **************LinReg: LogisticRegression ************     /
 #___________________________________________________________/
 
 
@@ -10,7 +10,7 @@ __author__ = "EA & MA"
 # from feature_selector import FeatureSelector
 
 import pandas as  pd
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 
@@ -38,13 +38,13 @@ def splitData(dataFrame, trainTestValidation):
         return X_train, y_train, X_val, y_val, X_test, y_test
 
 def TrainingDefaultParameters(X_train, y_train):
-    clf = LinearRegression()
+    clf = LogisticRegression()
     clf.fit(X_train,y_train)
     return clf
 
 def TrainingFine_tunning(X_train, y_train,parameters):
     if(parameters != None):
-        clf = LinearRegression()
+        clf = LogisticRegression()
         clf.set_params(**parameters)
         clf.fit(X_train,y_train)
         return clf
@@ -54,9 +54,9 @@ def TrainingFine_tunning(X_train, y_train,parameters):
 #______________________________________________________________________________________|
 
 def autotuning(X_train, y_train):
-    parameters = {'fit_intercept':[True,False], 'normalize':[True,False], 'copy_X':[True, False]}
+    parameters = {'fit_intercept':[True,False]}
 
-    clf_LinReg= LinearRegression()
+    clf_LinReg= LogisticRegression()
     clf=GridSearchCV(clf_LinReg,parameters)
     clf.fit(X_train,y_train)
    # print(clf.best_estimator_)
@@ -80,7 +80,7 @@ def scoring(y_test,predict_test,y_val,predict_val,clf):
 
     data["Model"]  =""    
     data["Status"]  ="Train/validation"
-    data["Accuracy Trainning"] = round(r2_score(y_test,predict_test),2)
+    data["Accuracy Trainning"] = round(accuracy_score(y_test,predict_test),2)
     if data["Accuracy Trainning"] >= 0.8:
             data["Etat Trainning"] = "Excellent"
     elif data["Accuracy Trainning"] >= 0.6:
@@ -88,7 +88,7 @@ def scoring(y_test,predict_test,y_val,predict_val,clf):
     else :
             data["Etat Trainning"] = "Mauvais"  
 
-    data["Accuracy Validation"] =  round(r2_score(y_val,predict_val),2)
+    data["Accuracy Validation"] =  round(accuracy_score(y_val,predict_val),2)
 
     if data["Accuracy Validation"] >= 0.8:
             data["Etat Validation"] = "Excellent"
@@ -96,9 +96,6 @@ def scoring(y_test,predict_test,y_val,predict_val,clf):
             data["Etat Validation"] = "Moyen"
     else :
             data["Etat Validation"] = "Mauvais"    
-
-    data["a"]=clf.coef_[0]
-    data["b"] = clf.intercept_
 
     return data
 

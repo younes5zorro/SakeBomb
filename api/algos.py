@@ -78,6 +78,10 @@ def get_model(model_name):
         from Models import DecisionTreeRegressor as DTReg
         model=DTReg
 
+    if(model_name == "régression logistique") :
+        from Models import LogisticRegression as LogReg
+        model=LogReg
+
     return model
 
 def get_score(json_data):
@@ -114,8 +118,9 @@ def get_score(json_data):
 
         score["Model"] = model_name
 
-        if model_type =="Régression Liniaire" :
-                score["x"]=X_test.reshape(1,X_test.shape[0])[0].tolist()
+        if model_type in ["Régression Liniaire"] :
+                score["x"]=X_test.reshape(1,-1)[0].tolist()
+                # score["x"]=X_test.reshape(1,X_test.shape[0])[0].tolist()
                 score["y"]=y_test.tolist()
 
         joblib.dump(clf, MODELS_FOLDER / filename)
