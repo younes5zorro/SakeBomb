@@ -104,6 +104,10 @@ def get_model(model_name):
     if(model_name == "xgboost classification") :
         from Models import XGBClassifier as XgbC
         model=XgbC
+    
+    if(model_name == "xgboost regression") :
+        from Models import XGBRegressorRegressor as XgbReg
+        model=XgbReg
 
     return model
 
