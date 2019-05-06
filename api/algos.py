@@ -55,14 +55,21 @@ def clear():
         MODELS_FOLDER.mkdir(exist_ok=True)
         return jsonify({"message":" removed"})
 
-def get_dataFram(link):
+def get_dataFram(link,input_field,output_field):
 
         file = requests.get(link).content
         
         df =pd.read_csv(BytesIO(file))
 
-        # tab = etl.fromcsv(link) 
-        # df = etl.todataframe(tab)
+        # print(list(df.columns))
+
+        input_field.append(output_field)
+
+        df = df[input_field]
+
+        print(list(df.columns))
+
+
         train_labels=df.iloc[:,-1]
 
         return df,train_labels
@@ -112,11 +119,14 @@ def get_model(model_name):
     return model
 
 def get_score(json_data):
+        
 
-        dataFrame,train_labels = get_dataFram(json_data["link"])
+        dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
+
         trainTestValidation=json_data['trainTestValidation']
         model_name  = json_data["model_name"]
         model_type  = json_data["model_type"]
+        
         model = get_model(model_type)
 
         if(json_data['Feautue_Selection'] == True ):
