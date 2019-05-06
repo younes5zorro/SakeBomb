@@ -121,7 +121,7 @@ def  feature_selector(dataFrame,train_labels):
     it identifies one of the variables to be removed. '''
 
     fs.identify_collinear(correlation_threshold = 0.98)
-    fs.identify_zero_importance(task = 'classification',
+    fs.identify_zero_importance(task = 'regression',
                             eval_metric = 'auc',
                             n_iterations = 10,
                              early_stopping = True)

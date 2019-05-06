@@ -14,7 +14,6 @@ import pandas as pd
 
 advance_alogs = Blueprint('advance_alogs', __name__)
 
-
 PACKAGE_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 UPLOAD_FOLDER = PACKAGE_ROOT / 'uploads'
@@ -30,7 +29,6 @@ def algos():
         return jsonify({'algos_version': '0.0.0',
                         'algos_api_version': '1.1.1'})
 
-
 @advance_alogs.route('/v1/delete_model', methods=['POST'])
 def delete_model():
         if request.method == 'POST':
@@ -40,7 +38,6 @@ def delete_model():
                 fil = [x.unlink() for x in MODELS_FOLDER.glob('*') if x.is_file() and x.name.split('~~')[2]==model_name+'.pkl']
                 
                 return jsonify({"message":model_name + " removed"})
-
 
 @advance_alogs.route('/v1/list_models', methods=['GET'])
 def list_models():
@@ -61,14 +58,9 @@ def get_dataFram(link,input_field,output_field):
         
         df =pd.read_csv(BytesIO(file))
 
-        # print(list(df.columns))
-
         input_field.append(output_field)
 
         df = df[input_field]
-
-        print(list(df.columns))
-
 
         train_labels=df.iloc[:,-1]
 
@@ -225,17 +217,25 @@ def compare():
 def get_static():
     if request.method == 'POST':
         
-        result =[]
         json_data = request.get_json()
 
         link  = json_data['link']
-        tab = etl.fromcsv(link) 
 
-        if 'target' in json_data:
+        file = requests.get(link).content
+        
+        df =pd.read_csv(BytesIO(file))
 
-                target_key = json_data['target']
-                cats = json_data['cats']
-                nums = json_data['nums']
+        tab = etl.fromdataframe(df) 
+
+        cats = json_data['cats']
+        stat_cat = json_data['stat_cat']
+        stat_num = json_data['stat_num']
+        nums = json_data['nums']
+
+        target_key = json_data['target']
+
+        if target_key != "" :
+                result =[]
 
                 target = etl.facet(tab, target_key)
                 for key in target.keys():
@@ -245,9 +245,10 @@ def get_static():
                         for field in nums:
                                 doc = {} 
                                 stats = etl.stats(target[key], field)
+
                                 doc = dict(stats._asdict())
                                 doc["field"] = field
-                                doc["type"] = "num"
+                                # doc["type"] = "num"
                                 dd["data"].append(doc)
 
                         for field in cats:
@@ -261,21 +262,58 @@ def get_static():
                                         doc["data"].append(dt)
 
                                 doc["field"] = field
-                                doc["type"] = "cat"
+                                # doc["type"] = "cat"
 
                                 dd["data"].append(doc)
                         result.append(dd)
-                
         
         else:
-                fields = json_data['fields']
-                for field in fields:
+                result = {}
+                result_nums  = []
+                result_cats  = []
+                for field in nums:
+                        doc = {} 
                         
                         stats = etl.stats(tab, field)
-                        doc = dict(stats._asdict())
-                        doc["field"] = field
 
-                        result.append(doc)
+                        dd = dict(stats._asdict())
+                        for s in stat_num:
+                                 doc[s] = dd[s]
+                        doc["field"] = field
+                        # doc["type"] = "num"
+                        result_nums.append(doc)
+
+                for field in cats:
+                        tt = etl.facet(tab, field)
+                        doc = {} 
+                        doc["data"] = []
+                        for k in tt.keys():
+                                dt ={}
+                                dd ={}
+                                dt["cat"]=k
+                                dd["count"],dd["freq"] = etl.valuecount(tab, field, k)
+                                for s in stat_cat:
+                                    dt[s] = dd[s]
+
+                                doc["data"].append(dt)
+
+                        doc["field"] = field
+                        # doc["type"] = "cat"
+
+                        result_cats.append(doc)
+
+                result["cat"]=result_cats
+                result["num"]=result_nums
+
+
+                # fields = json_data['fields']
+                # for field in fields:
+                        
+                #         stats = etl.stats(tab, field)
+                #         doc = dict(stats._asdict())
+                #         doc["field"] = field
+
+                #         result.append(doc)
 
         # Step 5: Return the response as JSON
         return jsonify(result) 

@@ -9,7 +9,6 @@ from io import BytesIO
 import petl as etl 
 import json
 
-
 advance_app = Blueprint('advance_app', __name__)
 
 
@@ -128,13 +127,33 @@ def data_excel():
 @advance_app.route('/v1/data/file/csv', methods=['POST'])
 def data_csv():
     if request.method == 'POST':
+
+        
         result = {}
         
         json_data = request.get_json()
         link  = json_data['link']
 
-        tab = etl.fromcsv(link) 
+        file = requests.get(link).content
+        
+        df =pd.read_csv(BytesIO(file))
 
+        tab = etl.fromdataframe(df) 
+
+
+        result["categorical"] = []
+        result["numerical"] = []
+        
+        for var in df.columns:
+
+                if df[var].dtypes=='O':
+                        result["categorical"].append(var)
+                else:
+                        # if len(df[var].unique())<20:
+                        #        result["categorical"].append(var)
+                        # else:
+                                result["numerical"].append(var)
+                                
         result["header"]  = list(etl.header(tab))
 
         result["data"] = list(etl.dicts(tab))

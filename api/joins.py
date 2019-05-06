@@ -32,10 +32,16 @@ def get_from_excel(cnx):
 def get_from_csv(cnx):
 
         link  = cnx['link']
-        tab = etl.fromcsv(link) 
+
+        file = requests.get(link).content
+        
+        df =pd.read_csv(BytesIO(file))
+
+        tab = etl.fromdataframe(df) 
+
+       #  tab = etl.fromcsv(link) 
 
         return tab
-
 
 def get_from_mysql(cnx):
 
