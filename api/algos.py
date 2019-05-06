@@ -119,8 +119,8 @@ def get_score(json_data):
         model_type  = json_data["model_type"]
         model = get_model(model_type)
 
-        # if(json_data['Feautue_Selection'] == True ):
-        #          dataFrame=model.feature_selector(dataFrame, train_labels)
+        if(json_data['Feautue_Selection'] == True ):
+                 dataFrame=model.feature_selector(dataFrame, train_labels)
 
         X_train, y_train, X_val, y_val, X_test, y_test=model.splitData(dataFrame, trainTestValidation)
 
