@@ -242,30 +242,40 @@ def get_static():
                         dd = {}
                         dd["key"] = key
                         dd["data"] = []
-                        for field in nums:
-                                doc = {} 
-                                stats = etl.stats(target[key], field)
 
-                                doc = dict(stats._asdict())
-                                doc["field"] = field
-                                # doc["type"] = "num"
-                                dd["data"].append(doc)
+                        if len(nums) > 0:
 
-                        for field in cats:
+                                for field in nums:
+                                        doc = {} 
+                                        stats = etl.stats(target[key], field)
+
+                                        ff = dict(stats._asdict())
+
+                                        for s in stat_num:
+                                                doc[s] = ff[s]
+                                        doc["field"] = field
+                                        # doc["type"] = "num"
+                                        dd["data"].append(doc)
+                                result.append(dd)
+                        else:
+                           for field in cats:
                                 tt = etl.facet(target[key], field)
                                 doc = {} 
                                 doc["data"] = []
                                 for k in tt.keys():
                                         dt ={}
+                                        ff ={}
                                         dt["cat"]=k
-                                        dt["count"],dt["freq"] = etl.valuecount(target[key], field, k)
+                                        ff["count"],ff["freq"] = etl.valuecount(target[key], field, k)
+                                        for s in stat_cat:
+                                                dt[s] = ff[s]
                                         doc["data"].append(dt)
 
                                 doc["field"] = field
                                 # doc["type"] = "cat"
 
                                 dd["data"].append(doc)
-                        result.append(dd)
+                           result.append(dd)
         
         else:
                 result = {}
@@ -317,7 +327,6 @@ def get_static():
 
         # Step 5: Return the response as JSON
         return jsonify(result) 
-
 
 
 # @advance_alogs.route('/v1/static', methods=['POST'])
