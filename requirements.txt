@@ -31,3 +31,6 @@ lightgbm==2.2.3
 xlrd==1.2.0
 # impyte==0.1.0
 xgboost==0.82
+GetOldTweets3==0.0.9
+googletrans==2.4.0
+vaderSentiment==3.2.1

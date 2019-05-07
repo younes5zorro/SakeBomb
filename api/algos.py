@@ -283,56 +283,79 @@ def get_static():
                 result_cats  = []
  
                 if len(nums) > 0:
-                        table = {}
-                        table["field"] = []
+
+
+                        catss = {}
+                        catss["data"] =  []
+                        # table = {}
+                        # table["field"] = []
 
                         for field in nums:
                                 # doc = {} 
+
+                                gg={}
+
+                                gg["field"]=field
                                 stats = etl.stats(tab, field)
 
                                 dd = dict(stats._asdict())
                                 for s in stat_num:
-                                        if field == nums[0]:
-                                                table[s] = []
+                                        # if field == nums[0]:
+                                        #         table[s] = []
+                                        gg[s]=dd[s]
+                                        # table[s].append(dd[s])
 
-                                        table[s].append(dd[s])
+                                
+                                # table["field"].append(field)
+                                catss["data"].append(gg)
+                        catss["header"] = list(catss["data"][0].keys())
 
-                                table["field"].append(field)
-                        result_nums.append(table)
+                        result_nums.append(catss)
                         
                 if len(cats) > 0:
 
                         for field in cats:
                                
-                                table = {}
+                                catss = {}
 
-                                table[field] = []
-                                for s in stat_cat:
-                                        table[s] = []
+                                catss["data"] =  []
+                                # table = {}
+
+                                # table[field] = []
+                                # for s in stat_cat:
+                                #         table[s] = []
 
                                 
                                 tt = etl.facet(tab, field)
                                 # doc = {} 
                                 # doc["data"] = []
                                 for k in tt.keys():
-                                        table[field].append(k)
+
+                                        gg = {}
+                                        gg[field]=k
+                                        # table[field].append(k)
                                         # dt ={}
                                         dd ={}
                                         # dt["cat"]=k
                                         dd["count"],dd["freq"] = etl.valuecount(tab, field, k)
                                         for s in stat_cat:
-                                                
-                                                table[s].append(dd[s])
+                                                gg[s]=dd[s]
+                                                # table[s].append(dd[s])
+                                        
+                                        if "freq" in gg:
+                                                gg["frequence"] = gg.pop("freq")
 
+                                        catss["data"].append(gg)
                                         # doc["data"].append(dt)
 
+                                catss["header"] = list(catss["data"][0].keys())
                                 # doc["field"] = field
                                 # doc["type"] = "cat"
 
-                                if "freq" in table:
-                                     table["frequence"] = table.pop("freq")
+                                # if "freq" in table:
+                                #      table["frequence"] = table.pop("freq")
 
-                                result_cats.append(table)
+                                result_cats.append(catss)
 
                 result["cat"]=result_cats
                 result["num"]=result_nums
@@ -341,6 +364,137 @@ def get_static():
         # Step 5: Return the response as JSON
         return jsonify(result) 
 
+
+
+
+# @advance_alogs.route('/v1/static', methods=['POST'])
+# def get_static():
+#     if request.method == 'POST':
+        
+#         json_data = request.get_json()
+
+#         link  = json_data['link']
+
+#         file = requests.get(link).content
+        
+#         df =pd.read_csv(BytesIO(file))
+
+#         tab = etl.fromdataframe(df) 
+
+#         cats = json_data['cats']
+#         stat_cat = json_data['stat_cat']
+#         stat_num = json_data['stat_num']
+#         nums = json_data['nums']
+
+#         target_key = json_data['target']
+
+#         if target_key != "" :
+#                 result =[]
+
+#                 target = etl.facet(tab, target_key)
+#                 for key in target.keys():
+#                         dd = {}
+#                         dd["key"] = key
+#                         dd["data"] = []
+
+#                         if len(nums) > 0:
+
+#                                 for field in nums:
+#                                         doc = {} 
+#                                         stats = etl.stats(target[key], field)
+
+#                                         ff = dict(stats._asdict())
+
+#                                         for s in stat_num:
+#                                                 doc[s] = ff[s]
+#                                         doc["field"] = field
+#                                         # doc["type"] = "num"
+#                                         dd["data"].append(doc)
+#                                 result.append(dd)
+#                         else:
+#                            for field in cats:
+#                                 tt = etl.facet(target[key], field)
+#                                 doc = {} 
+#                                 doc["data"] = []
+#                                 for k in tt.keys():
+#                                         dt ={}
+#                                         ff ={}
+#                                         dt["cat"]=k
+#                                         ff["count"],ff["freq"] = etl.valuecount(target[key], field, k)
+#                                         for s in stat_cat:
+#                                                 dt[s] = ff[s]
+#                                         doc["data"].append(dt)
+
+#                                 doc["field"] = field
+#                                 # doc["type"] = "cat"
+
+#                                 dd["data"].append(doc)
+#                            result.append(dd)
+        
+#         else:
+#                 result = {}
+#                 result_nums  = []
+#                 result_cats  = []
+ 
+#                 if len(nums) > 0:
+#                         table = {}
+#                         table["field"] = []
+
+#                         for field in nums:
+#                                 # doc = {} 
+#                                 stats = etl.stats(tab, field)
+
+#                                 dd = dict(stats._asdict())
+#                                 for s in stat_num:
+#                                         if field == nums[0]:
+#                                                 table[s] = []
+
+#                                         table[s].append(dd[s])
+
+#                                 table["field"].append(field)
+#                         result_nums.append(table)
+                        
+#                 if len(cats) > 0:
+
+#                         for field in cats:
+                               
+#                                 catss = {}
+#                                 table = {}
+
+#                                 table[field] = []
+#                                 for s in stat_cat:
+#                                         table[s] = []
+
+                                
+#                                 tt = etl.facet(tab, field)
+#                                 # doc = {} 
+#                                 # doc["data"] = []
+#                                 for k in tt.keys():
+#                                         table[field].append(k)
+#                                         # dt ={}
+#                                         dd ={}
+#                                         # dt["cat"]=k
+#                                         dd["count"],dd["freq"] = etl.valuecount(tab, field, k)
+#                                         for s in stat_cat:
+                                                
+#                                                 table[s].append(dd[s])
+
+#                                         # doc["data"].append(dt)
+
+#                                 # doc["field"] = field
+#                                 # doc["type"] = "cat"
+
+#                                 if "freq" in table:
+#                                      table["frequence"] = table.pop("freq")
+
+#                                 result_cats.append(table)
+
+#                 result["cat"]=result_cats
+#                 result["num"]=result_nums
+
+
+#         # Step 5: Return the response as JSON
+#         return jsonify(result) 
 
 # @advance_alogs.route('/v1/static', methods=['POST'])
 # def get_static():
