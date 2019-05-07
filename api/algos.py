@@ -281,36 +281,53 @@ def get_static():
                 result = {}
                 result_nums  = []
                 result_cats  = []
-                for field in nums:
-                        doc = {} 
+ 
+                if len(nums) > 0:
+                        table = {}
+                        table["field"] = []
+
+                        for field in nums:
+                                # doc = {} 
+                                stats = etl.stats(tab, field)
+
+                                dd = dict(stats._asdict())
+                                for s in stat_num:
+                                        if field == nums[0]:
+                                                table[s] = []
+
+                                        table[s].append(dd[s])
+
+                                table["field"].append(field)
+                        result_nums.append(table)
                         
-                        stats = etl.stats(tab, field)
+                if len(cats) > 0:
 
-                        dd = dict(stats._asdict())
-                        for s in stat_num:
-                                 doc[s] = dd[s]
-                        doc["field"] = field
-                        # doc["type"] = "num"
-                        result_nums.append(doc)
-
-                for field in cats:
-                        tt = etl.facet(tab, field)
-                        doc = {} 
-                        doc["data"] = []
-                        for k in tt.keys():
-                                dt ={}
-                                dd ={}
-                                dt["cat"]=k
-                                dd["count"],dd["freq"] = etl.valuecount(tab, field, k)
+                        for field in cats:
+                               
+                                table = {}
                                 for s in stat_cat:
-                                    dt[s] = dd[s]
+                                        table[s] = []
 
-                                doc["data"].append(dt)
+                                table[field] = []
+                                tt = etl.facet(tab, field)
+                                # doc = {} 
+                                # doc["data"] = []
+                                for k in tt.keys():
+                                        table[field].append(k)
+                                        # dt ={}
+                                        dd ={}
+                                        # dt["cat"]=k
+                                        dd["count"],dd["freq"] = etl.valuecount(tab, field, k)
+                                        for s in stat_cat:
+                                                
+                                                table[s].append(dd[s])
 
-                        doc["field"] = field
-                        # doc["type"] = "cat"
+                                        # doc["data"].append(dt)
 
-                        result_cats.append(doc)
+                                # doc["field"] = field
+                                # doc["type"] = "cat"
+
+                                result_cats.append(table)
 
                 result["cat"]=result_cats
                 result["num"]=result_nums
