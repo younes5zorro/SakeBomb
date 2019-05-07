@@ -305,10 +305,12 @@ def get_static():
                         for field in cats:
                                
                                 table = {}
+
+                                table[field] = []
                                 for s in stat_cat:
                                         table[s] = []
 
-                                table[field] = []
+                                
                                 tt = etl.facet(tab, field)
                                 # doc = {} 
                                 # doc["data"] = []
@@ -327,20 +329,14 @@ def get_static():
                                 # doc["field"] = field
                                 # doc["type"] = "cat"
 
+                                if "freq" in table:
+                                     table["frequence"] = table.pop("freq")
+
                                 result_cats.append(table)
 
                 result["cat"]=result_cats
                 result["num"]=result_nums
 
-
-                # fields = json_data['fields']
-                # for field in fields:
-                        
-                #         stats = etl.stats(tab, field)
-                #         doc = dict(stats._asdict())
-                #         doc["field"] = field
-
-                #         result.append(doc)
 
         # Step 5: Return the response as JSON
         return jsonify(result) 
