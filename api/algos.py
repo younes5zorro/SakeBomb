@@ -404,7 +404,7 @@ def features_selection():
                 print('features with coefficients shrank to zero: {}'.format(np.sum(sel_.estimator_.coef_ == 0)))
 
                 result["labels"] = list(X_train.columns)
-                result["values"] = list(np.abs(np.around(sel_.estimator_.coef_, decimals=4))*100)
+                result["values"] = list(np.around(np.abs(sel_.estimator_.coef_)*100, decimals=2))
 
                 return jsonify(result)
 
