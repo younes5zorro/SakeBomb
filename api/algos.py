@@ -302,10 +302,25 @@ def get_static():
                                 for s in stat_num:
                                         # if field == nums[0]:
                                         #         table[s] = []
-                                        gg[s]=dd[s]
+                                        gg[s]=round(dd[s],2)
                                         # table[s].append(dd[s])
 
+                                if "mean" in gg:
+                                        gg["moyenne"] = gg.pop("mean")
                                 
+                                if "pstdev" in gg:
+                                        gg["ecart-type"] = gg.pop("pstdev")
+                                        
+                                if "pvariance" in gg:
+                                        gg["variance"] = gg.pop("pvariance")
+                                        
+                                # if "sum" in gg:
+                                #         gg["somme"] = gg.pop("sum")
+                                        
+                                # if "freq" in gg:
+                                #         gg["frequence"] = gg.pop("freq")
+
+                                        
                                 # table["field"].append(field)
                                 catss["data"].append(gg)
                         catss["header"] = list(catss["data"][0].keys())

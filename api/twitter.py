@@ -27,7 +27,6 @@ def translate_teweet(text):
     return translation.text
     
 
-
 def normalize(text):
     text= translate_teweet(text)
     text=remove_links(text)
