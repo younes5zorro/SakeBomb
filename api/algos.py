@@ -11,6 +11,8 @@ from io import BytesIO
 import requests
 
 import pandas as pd
+import numpy as np
+
 
 advance_alogs = Blueprint('advance_alogs', __name__)
 
@@ -380,7 +382,41 @@ def get_static():
         return jsonify(result) 
 
 
+@advance_alogs.route('/v1/selection', methods=['POST'])
+def features_selection():
+        if request.method == 'POST':
+                from sklearn.linear_model import Lasso
+                from sklearn.feature_selection import SelectFromModel
 
+                json_data = request.get_json()
+                link = json_data["link"]
+
+                result ={}
+                X_train, y_train= get_ForSelection(link)
+
+                sel_ = SelectFromModel(Lasso(alpha=0.005, random_state=0)) # remember to set the seed, the random state in this function
+                sel_.fit(X_train, y_train)
+
+                selected_feat = X_train.columns[(sel_.get_support())]
+
+                print('total features: {}'.format((X_train.shape[1])))
+                print('selected features: {}'.format(len(selected_feat)))
+                print('features with coefficients shrank to zero: {}'.format(np.sum(sel_.estimator_.coef_ == 0)))
+
+                result["labels"] = list(X_train.columns)
+                result["values"] = list(np.abs(np.around(sel_.estimator_.coef_, decimals=4))*100)
+
+                return jsonify(result)
+
+def get_ForSelection(link):
+
+        file = requests.get(link).content
+        
+        df =pd.read_csv(BytesIO(file))
+        X_train = df.iloc[:,:-1]  #independent columns
+        y_train = df.iloc[:,-1] 
+
+        return X_train,y_train
 
 # @advance_alogs.route('/v1/static', methods=['POST'])
 # def get_static():
