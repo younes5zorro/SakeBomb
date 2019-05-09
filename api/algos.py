@@ -381,7 +381,6 @@ def get_static():
         # Step 5: Return the response as JSON
         return jsonify(result) 
 
-
 @advance_alogs.route('/v1/selection', methods=['POST'])
 def features_selection():
         if request.method == 'POST':
@@ -586,4 +585,3 @@ def get_ForSelection(link):
 
 #         # Step 5: Return the response as JSON
 #         return jsonify(result) 
-
