@@ -408,6 +408,25 @@ def features_selection():
 
                 return jsonify(result)
 
+
+@advance_alogs.route('/v1/kmean', methods=['POST'])
+def kmeandata():
+        if request.method == 'POST':
+
+                json_data = request.get_json()
+                link = json_data["link"]
+                header = json_data["header"]
+
+                file = requests.get(link).content
+        
+                df =pd.read_csv(BytesIO(file))
+
+                df = df[header]
+
+                result = df.values.tolist()
+
+                return jsonify(result)
+
 def get_ForSelection(link):
 
         file = requests.get(link).content

@@ -161,7 +161,6 @@ def data_csv():
         # Step 5: Return the response as JSON
         return jsonify(result) 
 
-
 @advance_app.route('/v1/data/db', methods=['POST'])
 def data_db():
     if request.method == 'POST':
