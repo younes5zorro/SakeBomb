@@ -74,13 +74,13 @@ def receive_data():
             sentiment=''
 
             if score >= 0.05 : 
-                sentiment = "pos"
+                sentiment = "Positif"
                 counts["Positif"] = counts["Positif"]+1
             if (score > -0.05 and score < 0.05 ) :
-                sentiment = "neu"
+                sentiment = "Neutre"
                 counts["Neutre"] = counts["Neutre"]+1
             if score <= -0.05 : 
-                sentiment = "neg"
+                sentiment = "Negatif"
                 counts["Negatif"] = counts["Negatif"]+1
             
             tweets_list.append({
