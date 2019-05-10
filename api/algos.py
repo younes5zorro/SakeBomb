@@ -160,6 +160,7 @@ def get_score(json_data):
         # Step 5: Return the response as JSON
         return score
 
+
 @advance_alogs.route('/v1/train', methods=['POST'])
 def train_model():
     if request.method == 'POST':
@@ -241,43 +242,77 @@ def get_static():
 
                 target = etl.facet(tab, target_key)
                 for key in target.keys():
-                        dd = {}
-                        dd["key"] = key
-                        dd["data"] = []
+                        # dd = {}
+                        # dd["header"] = []
+                        # dd["header"] = key
+                        # dd["data"] = []
 
                         if len(nums) > 0:
 
+                                catss = {}
+                                catss["data"] =  []
                                 for field in nums:
-                                        doc = {} 
+
+                                        gg={}
+
+                                        gg["field"]=field
+                                        gg[target_key]=key
+
+                                        # doc = {} 
                                         stats = etl.stats(target[key], field)
 
                                         ff = dict(stats._asdict())
 
                                         for s in stat_num:
-                                                doc[s] = ff[s]
-                                        doc["field"] = field
+                                               gg[s]=round(ff[s],2)
+
+                                        if "mean" in gg:
+                                                gg["moyenne"] = gg.pop("mean")
+                                
+                                        if "pstdev" in gg:
+                                                gg["ecart-type"] = gg.pop("pstdev")
+                                        
+                                        if "pvariance" in gg:
+                                                gg["variance"] = gg.pop("pvariance")
+
+                                        catss["data"].append(gg)
+
                                         # doc["type"] = "num"
-                                        dd["data"].append(doc)
-                                result.append(dd)
-                        else:
+                                        # dd["data"].append(doc)
+                                catss["header"] = list(catss["data"][0].keys())
+                                result.append(catss)
+
+                        if len(cats) > 0:
+
+                           catss = {}
+                           catss["data"] =  []       
+
                            for field in cats:
                                 tt = etl.facet(target[key], field)
                                 doc = {} 
                                 doc["data"] = []
                                 for k in tt.keys():
+
+                                        gg = {}
+                                        gg[field]=k
+                                        gg[target_key]=key
+
                                         dt ={}
                                         ff ={}
-                                        dt["cat"]=k
                                         ff["count"],ff["freq"] = etl.valuecount(target[key], field, k)
+                                        
                                         for s in stat_cat:
-                                                dt[s] = ff[s]
-                                        doc["data"].append(dt)
+                                                gg[s] = ff[s]
 
-                                doc["field"] = field
-                                # doc["type"] = "cat"
+                                        if "freq" in gg:
+                                                gg["frequence"] = gg.pop("freq")
 
-                                dd["data"].append(doc)
-                           result.append(dd)
+                                        catss["data"].append(gg)
+
+                                catss["header"] = list(catss["data"][0].keys())
+                                result.append(catss)
+                                
+                        #    result.append(dd)
         
         else:
                 result = {}
@@ -285,7 +320,6 @@ def get_static():
                 result_cats  = []
  
                 if len(nums) > 0:
-
 
                         catss = {}
                         catss["data"] =  []

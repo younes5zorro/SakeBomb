@@ -143,6 +143,8 @@ def  feature_selector(dataFrame,train_labels):
 
     return train_no_missing_zero
 
+
+
 # def visualization(dtree):
 #     dot_data = StringIO()
 #     export_graphviz(dtree, out_file=dot_data,
@@ -153,3 +155,5 @@ def  feature_selector(dataFrame,train_labels):
 #     utils.ensure_dir("output/visualisation")
 #     Image(graph.write_png('output/visualisation/Tree_visu.png'))
 #     return image
+
+

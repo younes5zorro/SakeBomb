@@ -38,7 +38,7 @@ def receive_data():
     if request.method == 'POST':
 
 
-
+       
 
 
 
