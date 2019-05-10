@@ -27,8 +27,9 @@ def translate_teweet(text):
     return translation.text
     
 
-def normalize(text):
-    text= translate_teweet(text)
+def normalize(text,lang):
+    if lang != "en":
+        text= translate_teweet(text)
     text=remove_links(text)
     text=special_removal(text)
     vs = analyzer.polarity_scores(text)
@@ -45,7 +46,7 @@ def initialize_criteria(criteria,since,until,QuerySearch,MaxTweets,Lang):
 
 # _______________________________ end_functions__________________________________
 
-@advance_tweet.route('/twitter', methods=['POST','GET'])
+@advance_tweet.route('/v1/twitter', methods=['POST','GET'])
 def receive_data():
     if request.method == 'POST':
         json_data = request.get_json()
@@ -55,7 +56,7 @@ def receive_data():
         until = json_data["until"] # yyyy-mm-dd
         QuerySearch = json_data["QuerySearch"] # str, example: 'royal air maroc wifi'
         MaxTweets = json_data["MaxTweets"] # int, example: 10
-        Lang = "fr"
+        Lang = json_data["lang"] # int, example: 10
 
         criteria = TweetCriteria()
         criteria = initialize_criteria(criteria,since,until,QuerySearch,MaxTweets,Lang)
@@ -70,7 +71,7 @@ def receive_data():
 
         for tweet in tweets:
             i=i+1
-            score=normalize(tweet.text)
+            score=normalize(tweet.text,Lang)
             sentiment=''
 
             if score >= 0.05 : 
