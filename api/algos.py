@@ -24,7 +24,7 @@ UPLOAD_FOLDER.mkdir(exist_ok=True)
 
 MODELS_FOLDER = PACKAGE_ROOT / 'saved'
 MODELS_FOLDER.mkdir(exist_ok=True)
-
+  
 
 @advance_alogs.route('/algos', methods=['GET'])
 def algos():
