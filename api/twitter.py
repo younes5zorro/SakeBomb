@@ -51,7 +51,6 @@ def receive_data():
     if request.method == 'POST':
         json_data = request.get_json()
 
-
         since = json_data["since"] # yyyy-mm-dd
         until = json_data["until"] # yyyy-mm-dd
         QuerySearch = json_data["QuerySearch"] # str, example: 'royal air maroc wifi'
@@ -62,15 +61,11 @@ def receive_data():
         criteria = initialize_criteria(criteria,since,until,QuerySearch,MaxTweets,Lang)
         tweets = TweetManager.getTweets (criteria)
 
-        i=0
-
-        
         tweets_list = []
         counts ={"Positif":0,"Neutre":0,"Negatif":0}
         result = {}
 
         for tweet in tweets:
-            i=i+1
             score=normalize(tweet.text,Lang)
             sentiment=''
 
@@ -91,7 +86,6 @@ def receive_data():
             # 'location':tweet.geo,
             'sentiment':sentiment
             })
-            print(i)
         
         result ["tweets"]=tweets_list
         result ["stats"]=counts
