@@ -1,3 +1,8 @@
+import matplotlib
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
+
 import numpy as np
 
 from sklearn.model_selection import learning_curve,validation_curve,train_test_split
@@ -10,6 +15,8 @@ import os
 from io import BytesIO
 import pandas as pd
 import requests
+
+
 
 def get_estimator(model_name):
     model  = {}
@@ -203,11 +210,7 @@ def plot_confusion_matrix(y_true, y_pred, classes,
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
-    import matplotlib
-    matplotlib.use("Agg")
-
-
-    import matplotlib.pyplot as plt
+    
 
     client_id = '799656b0ea972d6'
     client_secret = '953bb107494227f9d350cc918ea33c6bd8c841b5'
