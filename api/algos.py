@@ -13,6 +13,7 @@ import requests
 import pandas as pd
 import numpy as np
 
+import Models.curves as curves
 
 advance_alogs = Blueprint('advance_alogs', __name__)
 
@@ -159,7 +160,6 @@ def get_score(json_data):
 
         # Step 5: Return the response as JSON
         return score
-
 
 @advance_alogs.route('/v1/train', methods=['POST'])
 def train_model():
@@ -441,7 +441,6 @@ def features_selection():
 
                 return jsonify(result)
 
-
 @advance_alogs.route('/v1/kmean', methods=['POST'])
 def kmeandata():
         if request.method == 'POST':
@@ -469,6 +468,111 @@ def get_ForSelection(link):
         y_train = df.iloc[:,-1] 
 
         return X_train,y_train
+
+@advance_alogs.route('/v1/l_curve', methods=['POST'])
+def l_curve():
+    if request.method == 'POST':
+
+        result ={}    
+        json_data = request.get_json()
+        
+        dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
+
+        X = dataFrame.iloc[:,:-1] 
+        Y = train_labels
+
+        model_name  = json_data["model_name"]
+        model_type  = json_data["model_type"]
+
+        estimator  = curves.get_estimator(model_type)
+
+        if model_type in ["Arbre de decision","Random Forest","SVM","régression logistique","xgboost classification"]:
+                result = curves.classifier_lc(X,Y,estimator,model_name)
+        else:
+                result = curves.regressor_lc(X,Y,estimator,model_name)
+
+        return jsonify(result)
+
+
+@advance_alogs.route('/v1/v_curve', methods=['POST'])
+def v_curve():
+    if request.method == 'POST':
+
+        result ={}    
+        json_data = request.get_json()
+        
+        dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
+
+        X = dataFrame.iloc[:,:-1] 
+        Y = train_labels
+
+        model_name  = json_data["model_name"]
+        model_type  = json_data["model_type"]
+
+        estimator  = curves.get_estimator(model_type)
+
+        param_name ="max_depth"
+        if model_type in ["Arbre de decision","Random Forest","SVM","régression logistique","xgboost classification"]:
+              
+                if model_type=="régression logistique":
+                        param_name ="max_iter"
+
+                result = curves.classifier_vc(X,Y,estimator,model_name,param_name)
+        else:
+
+                if model_type=="Régression Liniaire":
+                        param_name ="n_jobs"
+               
+                result = curves.regressor_vc(X,Y,estimator,model_name,param_name)
+
+        return jsonify(result)
+
+
+@advance_alogs.route('/v1/roc_curve', methods=['POST'])
+def roc_curve():
+    if request.method == 'POST':
+
+        result ={}    
+        json_data = request.get_json()
+        
+        dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
+
+        X = dataFrame.iloc[:,:-1] 
+        Y = train_labels
+
+        model_name  = json_data["model_name"]
+        model_type  = json_data["model_type"]
+
+        estimator  = curves.get_estimator(model_type)
+
+        if model_type  in ["Arbre de decision","Random Forest","SVM","régression logistique","xgboost classification"]:
+                
+                result = curves.classifier_roc(X,Y,estimator,model_name)
+    
+        return jsonify(result)
+
+@advance_alogs.route('/v1/cm_curve', methods=['POST'])
+def cm_curve():
+    if request.method == 'POST':
+
+        result ={}    
+        json_data = request.get_json()
+        
+        dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
+
+        X = dataFrame.iloc[:,:-1] 
+        Y = train_labels
+
+        model_name  = json_data["model_name"]
+        model_type  = json_data["model_type"]
+
+        estimator  = curves.get_estimator(model_type)
+
+        if model_type  in ["Arbre de decision","Random Forest","SVM","régression logistique","xgboost classification"]:
+                
+                result = curves.classifier_cm(X,Y,estimator,model_name)
+    
+        return jsonify(result)
 
 # @advance_alogs.route('/v1/static', methods=['POST'])
 # def get_static():
