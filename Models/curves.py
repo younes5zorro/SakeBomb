@@ -4,7 +4,6 @@ from sklearn.model_selection import learning_curve,validation_curve,train_test_s
 import sklearn.metrics as metrics
 from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import unique_labels
-import matplotlib.pyplot as plt
 
 from imgurpython import ImgurClient
 import os
@@ -200,9 +199,16 @@ def plot_confusion_matrix(y_true, y_pred, classes,
                           path=""
                           ):
     """
+
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
+    import matplotlib
+    matplotlib.use("Agg")
+
+
+    import matplotlib.pyplot as plt
+
     client_id = '799656b0ea972d6'
     client_secret = '953bb107494227f9d350cc918ea33c6bd8c841b5'
 
