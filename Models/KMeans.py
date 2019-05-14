@@ -38,7 +38,7 @@ def TrainingFine_tunning(X_train, y_train,parameters):
 
 def autotuning(X_train, y_train):
 
-    parameters={"n_clusters": range(2, 20)}
+    parameters={"n_clusters": range(2, 20),"max_iter":[300,400,500,600]}
     clf_KMeans= KMeans()
     clf=GridSearchCV(clf_KMeans,parameters)
     clf.fit(X_train,y_train)

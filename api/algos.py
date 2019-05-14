@@ -115,7 +115,7 @@ def get_model(model_name):
 
 def get_score(json_data):
         
-
+        result ={}
         dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
 
         trainTestValidation=json_data['trainTestValidation']
@@ -149,17 +149,21 @@ def get_score(json_data):
         # filename = model_name+"_"+str(randint(0, 3000))+".pkl"
 
         score["Model"] = model_name
+        
 
+        result['score'] = score
         if model_type in ["Régression Liniaire"] :
-                score["x"]=X_test.reshape(1,-1)[0].tolist()
+                datax=X_test.reshape(1,-1)[0].tolist()
                 # score["x"]=X_test.reshape(1,X_test.shape[0])[0].tolist()
-                score["y"]=y_test.tolist()
+                datay=y_test.tolist()
+
+                result['data']  = [list(a) for a in zip(datax,datay)]
 
         joblib.dump(clf, MODELS_FOLDER / filename)
         # pickle.dump(clf, open(MODELS_FOLDER / filename , 'wb'))
 
         # Step 5: Return the response as JSON
-        return score
+        return result
 
 @advance_alogs.route('/v1/train', methods=['POST'])
 def train_model():
@@ -238,7 +242,9 @@ def get_static():
         target_key = json_data['target']
 
         if target_key != "" :
-                result =[]
+                result = {}
+                result_nums  = []
+                result_cats  = []
 
                 target = etl.facet(tab, target_key)
                 for key in target.keys():
@@ -280,24 +286,30 @@ def get_static():
                                         # doc["type"] = "num"
                                         # dd["data"].append(doc)
                                 catss["header"] = list(catss["data"][0].keys())
-                                result.append(catss)
+                                for item in result_nums :
+                                        if item["header"] == catss["header"]:
+                                                item["data"].append(catss["header"])
+
+                                result_nums.append(catss)
 
                         if len(cats) > 0:
 
-                           catss = {}
-                           catss["data"] =  []       
+                                 
 
                            for field in cats:
+                                
+                                catss = {}
+                                catss["data"] =  [] 
                                 tt = etl.facet(target[key], field)
-                                doc = {} 
-                                doc["data"] = []
+                                # doc = {} 
+                                # doc["data"] = []
                                 for k in tt.keys():
 
                                         gg = {}
                                         gg[field]=k
                                         gg[target_key]=key
 
-                                        dt ={}
+                                        # dt ={}
                                         ff ={}
                                         ff["count"],ff["freq"] = etl.valuecount(target[key], field, k)
                                         
@@ -305,13 +317,16 @@ def get_static():
                                                 gg[s] = ff[s]
 
                                         if "freq" in gg:
-                                                gg["frequence"] = gg.pop("freq")
+                                                gg["frequence"] = round(gg.pop("freq"),2)
 
                                         catss["data"].append(gg)
 
-                                catss["header"] = list(catss["data"][0].keys())
-                                result.append(catss)
                                 
+                                catss["header"] = list(catss["data"][0].keys())
+                                result_cats.append(catss)
+
+                        result["cat"]=result_cats
+                        result["num"]=result_nums        
                         #    result.append(dd)
         
         else:
@@ -394,7 +409,7 @@ def get_static():
                                                 # table[s].append(dd[s])
                                         
                                         if "freq" in gg:
-                                                gg["frequence"] = gg.pop("freq")
+                                                gg["frequence"] = round(gg.pop("freq"),2)
 
                                         catss["data"].append(gg)
                                         # doc["data"].append(dt)
@@ -570,7 +585,7 @@ def cm_curve():
 
         if model_type  in ["Arbre de decision","Random Forest","SVM","régression logistique","xgboost classification"]:
                 
-                result = curves.classifier_cm(X,Y,estimator,model_name)
+                result['link'] = curves.classifier_cm(X,Y,estimator,model_name)
     
         return jsonify(result)
 

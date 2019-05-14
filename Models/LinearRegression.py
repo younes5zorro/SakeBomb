@@ -97,8 +97,8 @@ def scoring(y_test,predict_test,y_val,predict_val,clf):
     else :
             data["Etat Validation"] = "Mauvais"    
 
-    data["a"]=clf.coef_[0]
-    data["b"] = clf.intercept_
+#     data["a"]=clf.coef_[0]
+#     data["b"] = clf.intercept_
 
     return data
 
