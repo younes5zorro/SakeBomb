@@ -261,8 +261,8 @@ def get_static():
 
                                         gg={}
 
-                                        gg["field"]=field
                                         gg[target_key]=key
+                                        gg["field"]=field
 
                                         # doc = {} 
                                         stats = etl.stats(target[key], field)
@@ -283,14 +283,14 @@ def get_static():
 
                                         catss["data"].append(gg)
 
-                                        # doc["type"] = "num"
-                                        # dd["data"].append(doc)
                                 catss["header"] = list(catss["data"][0].keys())
+                                added = True
                                 for item in result_nums :
                                         if item["header"] == catss["header"]:
-                                                item["data"].append(catss["header"])
-
-                                result_nums.append(catss)
+                                                item["data"] = item["data"] + catss["data"]
+                                                added = False
+                                                
+                                if added : result_nums.append(catss)
 
                         if len(cats) > 0:
 
@@ -306,8 +306,8 @@ def get_static():
                                 for k in tt.keys():
 
                                         gg = {}
-                                        gg[field]=k
                                         gg[target_key]=key
+                                        gg[field]=k
 
                                         # dt ={}
                                         ff ={}
@@ -323,7 +323,14 @@ def get_static():
 
                                 
                                 catss["header"] = list(catss["data"][0].keys())
-                                result_cats.append(catss)
+                                
+                                added = True
+                                for item in result_cats :
+                                        if item["header"] == catss["header"]:
+                                                item["data"] = item["data"] + catss["data"]
+                                                added = False
+                                                
+                                if added : result_cats.append(catss)
 
                         result["cat"]=result_cats
                         result["num"]=result_nums        
