@@ -248,10 +248,6 @@ def get_static():
 
                 target = etl.facet(tab, target_key)
                 for key in target.keys():
-                        # dd = {}
-                        # dd["header"] = []
-                        # dd["header"] = key
-                        # dd["data"] = []
 
                         if len(nums) > 0:
 
@@ -264,7 +260,6 @@ def get_static():
                                         gg[target_key]=key
                                         gg["field"]=field
 
-                                        # doc = {} 
                                         stats = etl.stats(target[key], field)
 
                                         ff = dict(stats._asdict())
@@ -287,29 +282,25 @@ def get_static():
                                 added = True
                                 for item in result_nums :
                                         if item["header"] == catss["header"]:
-                                                item["data"] = item["data"] + catss["data"]
+                                                item["data"].extend(catss["data"])
                                                 added = False
                                                 
                                 if added : result_nums.append(catss)
 
                         if len(cats) > 0:
 
-                                 
-
                            for field in cats:
                                 
                                 catss = {}
                                 catss["data"] =  [] 
                                 tt = etl.facet(target[key], field)
-                                # doc = {} 
-                                # doc["data"] = []
+
                                 for k in tt.keys():
 
                                         gg = {}
                                         gg[target_key]=key
                                         gg[field]=k
 
-                                        # dt ={}
                                         ff ={}
                                         ff["count"],ff["freq"] = etl.valuecount(target[key], field, k)
                                         
@@ -327,14 +318,13 @@ def get_static():
                                 added = True
                                 for item in result_cats :
                                         if item["header"] == catss["header"]:
-                                                item["data"] = item["data"] + catss["data"]
+                                                item["data"].extend(catss["data"])
                                                 added = False
                                                 
                                 if added : result_cats.append(catss)
 
                         result["cat"]=result_cats
                         result["num"]=result_nums        
-                        #    result.append(dd)
         
         else:
                 result = {}
@@ -345,11 +335,8 @@ def get_static():
 
                         catss = {}
                         catss["data"] =  []
-                        # table = {}
-                        # table["field"] = []
 
                         for field in nums:
-                                # doc = {} 
 
                                 gg={}
 
@@ -358,10 +345,7 @@ def get_static():
 
                                 dd = dict(stats._asdict())
                                 for s in stat_num:
-                                        # if field == nums[0]:
-                                        #         table[s] = []
                                         gg[s]=round(dd[s],2)
-                                        # table[s].append(dd[s])
 
                                 if "mean" in gg:
                                         gg["moyenne"] = gg.pop("mean")
@@ -379,7 +363,6 @@ def get_static():
                                 #         gg["frequence"] = gg.pop("freq")
 
                                         
-                                # table["field"].append(field)
                                 catss["data"].append(gg)
                         catss["header"] = list(catss["data"][0].keys())
 
@@ -390,43 +373,25 @@ def get_static():
                         for field in cats:
                                
                                 catss = {}
-
                                 catss["data"] =  []
-                                # table = {}
 
-                                # table[field] = []
-                                # for s in stat_cat:
-                                #         table[s] = []
-
-                                
                                 tt = etl.facet(tab, field)
-                                # doc = {} 
-                                # doc["data"] = []
                                 for k in tt.keys():
 
                                         gg = {}
                                         gg[field]=k
-                                        # table[field].append(k)
-                                        # dt ={}
                                         dd ={}
-                                        # dt["cat"]=k
+
                                         dd["count"],dd["freq"] = etl.valuecount(tab, field, k)
                                         for s in stat_cat:
                                                 gg[s]=dd[s]
-                                                # table[s].append(dd[s])
                                         
                                         if "freq" in gg:
                                                 gg["frequence"] = round(gg.pop("freq"),2)
 
                                         catss["data"].append(gg)
-                                        # doc["data"].append(dt)
 
                                 catss["header"] = list(catss["data"][0].keys())
-                                # doc["field"] = field
-                                # doc["type"] = "cat"
-
-                                # if "freq" in table:
-                                #      table["frequence"] = table.pop("freq")
 
                                 result_cats.append(catss)
 
