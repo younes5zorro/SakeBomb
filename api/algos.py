@@ -649,7 +649,6 @@ def get_backstatic():
                                         for s in stat_num:
                                                gg[s]=round(dd[s],2)
 
-                                               gg["variance"] = gg.pop("pvariance")
 
                                         catss["data"].append(gg)
 
