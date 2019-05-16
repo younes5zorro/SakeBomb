@@ -259,6 +259,7 @@ def get_static():
 
                                         gg[target_key]=key
                                         catss["field"]=field
+                                        gg["field"]=field
 
                                         stats = etl.stats(target[key], field)
 
@@ -342,6 +343,7 @@ def get_static():
                                 gg={}
 
                                 catss["field"]=field
+                                gg["field"]=field
                                 stats = etl.stats(tab, field)
 
                                 dd = dict(stats._asdict())
@@ -448,11 +450,11 @@ def kmeandata():
 
                 return jsonify(result)
 
-def get_ForSelection(link):
+def get_ForSelection(link,input_field,output_field):
 
         file = requests.get(link).content
         
-        df =pd.read_csv(BytesIO(file))
+        df ,l =get_dataFram(link,input_field,output_field)
         X_train = df.iloc[:,:-1]  #independent columns
         y_train = df.iloc[:,-1] 
 
