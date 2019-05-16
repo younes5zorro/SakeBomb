@@ -632,7 +632,7 @@ def get_backstatic():
 
                                         gg={}
 
-                                        gg[target_key]=key
+                                        gg[ntarget_key]=key
                                         catss["field"]=field
                                         gg["field"]=field
 
@@ -705,7 +705,7 @@ def get_backstatic():
                                 for k in tt.keys():
 
                                         gg = {}
-                                        gg[target_key]=key
+                                        gg[ctarget_key]=key
                                         gg[field]=k
                                         catss["field"]=field
 
