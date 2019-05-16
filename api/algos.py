@@ -621,6 +621,12 @@ def get_backstatic():
                                 for s in stat_num:
                                         gg[s]=round(dd[s],2)
 
+                                catss["data"].append(gg)
+                                
+                        catss["header"] = list(catss["data"][0].keys())
+
+                        result_nums.append(catss)
+
         else:
                 target = etl.facet(tab, ntarget_key)
                 for key in target.keys():
