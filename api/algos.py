@@ -258,7 +258,7 @@ def get_static():
                                         gg={}
 
                                         gg[target_key]=key
-                                        gg["field"]=field
+                                        catss["field"]=field
 
                                         stats = etl.stats(target[key], field)
 
@@ -300,6 +300,7 @@ def get_static():
                                         gg = {}
                                         gg[target_key]=key
                                         gg[field]=k
+                                        catss["field"]=field
 
                                         ff ={}
                                         ff["count"],ff["freq"] = etl.valuecount(target[key], field, k)
@@ -340,7 +341,7 @@ def get_static():
 
                                 gg={}
 
-                                gg["field"]=field
+                                catss["field"]=field
                                 stats = etl.stats(tab, field)
 
                                 dd = dict(stats._asdict())
@@ -380,6 +381,7 @@ def get_static():
 
                                         gg = {}
                                         gg[field]=k
+                                        catss["field"]=field
                                         dd ={}
 
                                         dd["count"],dd["freq"] = etl.valuecount(tab, field, k)
@@ -560,6 +562,205 @@ def cm_curve():
                 result['link'] = curves.classifier_cm(X,Y,estimator,model_name)
     
         return jsonify(result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@advance_alogs.route('/v1/backstatic', methods=['POST'])
+def get_backstatic():
+    if request.method == 'POST':
+        
+        json_data = request.get_json()
+
+        link  = json_data['link']
+
+        file = requests.get(link).content
+        
+        df =pd.read_csv(BytesIO(file))
+
+        tab = etl.fromdataframe(df) 
+
+        cats = json_data['cats']
+        stat_cat = json_data['stat_cat']
+        stat_num = json_data['stat_num']
+        nums = json_data['nums']
+        
+
+        ntarget_key = json_data['ntarget']
+        ctarget_key = json_data['ctarget']
+
+        result = {}
+        result_nums  = []
+        result_cats  = []
+
+        if ntarget_key == ctarget_key  == "" :
+
+ 
+                if len(nums) > 0:
+
+                        catss = {}
+                        catss["data"] =  []
+
+                        for field in nums:
+
+                                gg={}
+
+                                gg["field"]=field
+                                stats = etl.stats(tab, field)
+
+                                dd = dict(stats._asdict())
+                                for s in stat_num:
+                                        gg[s]=round(dd[s],2)
+
+                                if "mean" in gg:
+                                        gg["moyenne"] = gg.pop("mean")
+                                
+                                if "pstdev" in gg:
+                                        gg["ecart-type"] = gg.pop("pstdev")
+                                        
+                                if "pvariance" in gg:
+                                        gg["variance"] = gg.pop("pvariance")
+                                        
+                                # if "sum" in gg:
+                                #         gg["somme"] = gg.pop("sum")
+                                        
+                                # if "freq" in gg:
+                                #         gg["frequence"] = gg.pop("freq")
+
+                                        
+                                catss["data"].append(gg)
+                        catss["header"] = list(catss["data"][0].keys())
+
+                        result_nums.append(catss)
+                        
+                if len(cats) > 0:
+
+                        for field in cats:
+                               
+                                catss = {}
+                                catss["data"] =  []
+
+                                tt = etl.facet(tab, field)
+                                for k in tt.keys():
+
+                                        gg = {}
+                                        gg[field]=k
+                                        dd ={}
+
+                                        dd["count"],dd["freq"] = etl.valuecount(tab, field, k)
+                                        for s in stat_cat:
+                                                gg[s]=dd[s]
+                                        
+                                        if "freq" in gg:
+                                                gg["frequence"] = round(gg.pop("freq"),2)
+
+                                        catss["data"].append(gg)
+
+                                catss["header"] = list(catss["data"][0].keys())
+
+                                result_cats.append(catss)
+
+                result["cat"]=result_cats
+                result["num"]=result_nums    
+        
+        else:
+
+
+                target = etl.facet(tab, target_key)
+                for key in target.keys():
+
+                        if len(nums) > 0:
+
+                                catss = {}
+                                catss["data"] =  []
+                                for field in nums:
+
+                                        gg={}
+
+                                        gg[target_key]=key
+                                        gg["field"]=field
+
+                                        stats = etl.stats(target[key], field)
+
+                                        ff = dict(stats._asdict())
+
+                                        for s in stat_num:
+                                               gg[s]=round(ff[s],2)
+
+                                        if "mean" in gg:
+                                                gg["moyenne"] = gg.pop("mean")
+                                
+                                        if "pstdev" in gg:
+                                                gg["ecart-type"] = gg.pop("pstdev")
+                                        
+                                        if "pvariance" in gg:
+                                                gg["variance"] = gg.pop("pvariance")
+
+                                        catss["data"].append(gg)
+
+                                catss["header"] = list(catss["data"][0].keys())
+                                added = True
+                                for item in result_nums :
+                                        if item["header"] == catss["header"]:
+                                                item["data"].extend(catss["data"])
+                                                added = False
+                                                
+                                if added : result_nums.append(catss)
+
+                        if len(cats) > 0:
+
+                           for field in cats:
+                                
+                                catss = {}
+                                catss["data"] =  [] 
+                                tt = etl.facet(target[key], field)
+
+                                for k in tt.keys():
+
+                                        gg = {}
+                                        gg[target_key]=key
+                                        gg[field]=k
+
+                                        ff ={}
+                                        ff["count"],ff["freq"] = etl.valuecount(target[key], field, k)
+                                        
+                                        for s in stat_cat:
+                                                gg[s] = ff[s]
+
+                                        if "freq" in gg:
+                                                gg["frequence"] = round(gg.pop("freq"),2)
+
+                                        catss["data"].append(gg)
+
+                                
+                                catss["header"] = list(catss["data"][0].keys())
+                                
+                                added = True
+                                for item in result_cats :
+                                        if item["header"] == catss["header"]:
+                                                item["data"].extend(catss["data"])
+                                                added = False
+                                                
+                                if added : result_cats.append(catss)
+
+                        result["cat"]=result_cats
+                        result["num"]=result_nums     
+                
+
+
+        # Step 5: Return the response as JSON
+        return jsonify(result) 
 
 # @advance_alogs.route('/v1/static', methods=['POST'])
 # def get_static():
