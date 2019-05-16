@@ -241,10 +241,11 @@ def get_static():
 
         target_key = json_data['target']
 
+        result = {}
+        result_nums  = []
+        result_cats  = []
+
         if target_key != "" :
-                result = {}
-                result_nums  = []
-                result_cats  = []
 
                 target = etl.facet(tab, target_key)
                 for key in target.keys():
@@ -263,19 +264,25 @@ def get_static():
 
                                         stats = etl.stats(target[key], field)
 
-                                        ff = dict(stats._asdict())
+                                        dd = dict(stats._asdict())
 
-                                        for s in stat_num:
-                                               gg[s]=round(ff[s],2)
-
-                                        if "mean" in gg:
-                                                gg["moyenne"] = gg.pop("mean")
+                                        dd["moyenne"] = dd.pop("mean")
                                 
-                                        if "pstdev" in gg:
-                                                gg["ecart-type"] = gg.pop("pstdev")
+                                        dd["ecart-type"] = dd.pop("pstdev")
                                         
-                                        if "pvariance" in gg:
-                                                gg["variance"] = gg.pop("pvariance")
+                                        dd["variance"] = dd.pop("pvariance")
+                                        
+                                        for s in stat_num:
+                                               gg[s]=round(dd[s],2)
+
+                                        # if "mean" in gg:
+                                        #         gg["moyenne"] = gg.pop("mean")
+                                
+                                        # if "pstdev" in gg:
+                                        #         gg["ecart-type"] = gg.pop("pstdev")
+                                        
+                                        # if "pvariance" in gg:
+                                        #         gg["variance"] = gg.pop("pvariance")
 
                                         catss["data"].append(gg)
 
@@ -303,15 +310,14 @@ def get_static():
                                         gg[field]=k
                                         catss["field"]=field
 
-                                        ff ={}
-                                        ff["count"],ff["freq"] = etl.valuecount(target[key], field, k)
-                                        
+                                        dd ={}
+                                        dd["count"],dd["frequence"] = etl.valuecount(target[key], field, k)
+
+
                                         for s in stat_cat:
-                                                gg[s] = ff[s]
+                                                gg[s] = round(dd[s],2)
 
-                                        if "freq" in gg:
-                                                gg["frequence"] = round(gg.pop("freq"),2)
-
+                                       
                                         catss["data"].append(gg)
 
                                 
@@ -329,9 +335,7 @@ def get_static():
                         result["num"]=result_nums        
         
         else:
-                result = {}
-                result_nums  = []
-                result_cats  = []
+                
  
                 if len(nums) > 0:
 
@@ -347,17 +351,17 @@ def get_static():
                                 stats = etl.stats(tab, field)
 
                                 dd = dict(stats._asdict())
+
+                                dd["moyenne"] = dd.pop("mean")
+                        
+                                dd["ecart-type"] = dd.pop("pstdev")
+                                
+                                dd["variance"] = dd.pop("pvariance")
+
                                 for s in stat_num:
                                         gg[s]=round(dd[s],2)
 
-                                if "mean" in gg:
-                                        gg["moyenne"] = gg.pop("mean")
                                 
-                                if "pstdev" in gg:
-                                        gg["ecart-type"] = gg.pop("pstdev")
-                                        
-                                if "pvariance" in gg:
-                                        gg["variance"] = gg.pop("pvariance")
                                         
                                 # if "sum" in gg:
                                 #         gg["somme"] = gg.pop("sum")
@@ -386,13 +390,10 @@ def get_static():
                                         catss["field"]=field
                                         dd ={}
 
-                                        dd["count"],dd["freq"] = etl.valuecount(tab, field, k)
+                                        dd["count"],dd["frequence"] = etl.valuecount(tab, field, k)
                                         for s in stat_cat:
                                                 gg[s]=dd[s]
                                         
-                                        if "freq" in gg:
-                                                gg["frequence"] = round(gg.pop("freq"),2)
-
                                         catss["data"].append(gg)
 
                                 catss["header"] = list(catss["data"][0].keys())
@@ -455,6 +456,7 @@ def get_ForSelection(link,input_field,output_field):
         file = requests.get(link).content
         
         df ,l =get_dataFram(link,input_field,output_field)
+
         X_train = df.iloc[:,:-1]  #independent columns
         y_train = df.iloc[:,-1] 
 
