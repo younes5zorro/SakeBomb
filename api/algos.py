@@ -275,15 +275,6 @@ def get_static():
                                         for s in stat_num:
                                                gg[s]=round(dd[s],2)
 
-                                        # if "mean" in gg:
-                                        #         gg["moyenne"] = gg.pop("mean")
-                                
-                                        # if "pstdev" in gg:
-                                        #         gg["ecart-type"] = gg.pop("pstdev")
-                                        
-                                        # if "pvariance" in gg:
-                                        #         gg["variance"] = gg.pop("pvariance")
-
                                         catss["data"].append(gg)
 
                                 catss["header"] = list(catss["data"][0].keys())
