@@ -288,10 +288,10 @@ def get_static():
 
                                 catss["header"] = list(catss["data"][0].keys())
                                 added = True
-                                for item in result_nums :
-                                        if item["header"] == catss["header"]:
-                                                item["data"].extend(catss["data"])
-                                                added = False
+                                # for item in result_nums :
+                                #         if item["header"] == catss["header"]:
+                                #                 item["data"].extend(catss["data"])
+                                #                 added = False
                                                 
                                 if added : result_nums.append(catss)
 
@@ -307,7 +307,9 @@ def get_static():
 
                                         gg = {}
                                         gg[target_key]=key
+
                                         gg[field]=k
+                                        # gg[field]=k
                                         catss["field"]=field
 
                                         dd ={}
