@@ -244,7 +244,7 @@ def get_static():
         result = {}
         result_nums  = []
         result_cats  = []
-
+ 
         if target_key != "" :
 
                 target = etl.facet(tab, target_key)
