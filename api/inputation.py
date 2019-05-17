@@ -6,7 +6,7 @@ from missingpy import MissForest
 from flask import request, Blueprint,jsonify
 
 # _____________requirements:_____________
-# missingpyVersion: 0.2.0
+# missingpy Version: 0.2.0
 
 advance_inputation = Blueprint('advance_inputation', __name__)
 
@@ -31,10 +31,11 @@ def knn_inp(df, k):
    
 
 #inputation most_frequent/median/mean	  
-def input_most_frequent(df):
+def input_most_frequent(df,strategy):
+   # strategy = ["most_frequent","mean","median"]
    X = np.asarray(s)
    from sklearn.impute import SimpleImputer
-   imp_median = SimpleImputer( strategy='most_frequent') #for median imputation replace 'mean' with 'median'
+   imp_median = SimpleImputer( strategy=strategy) #for median imputation replace 'mean' with 'median'
    print(imp_median.fit(X))
    X = imp_median.transform(X)
    df1 = pd.DataFrame(X)
@@ -42,28 +43,6 @@ def input_most_frequent(df):
    return(df1)
     
 
-
-def input_median(df):
-   X = np.asarray(s)
-   from sklearn.impute import SimpleImputer
-   imp_median = SimpleImputer( strategy='median') #for median imputation replace 'mean' with 'median'
-   print(imp_median.fit(X))
-   X = imp_median.transform(X)
-   df1 = pd.DataFrame(X)
-   df1.columns = df.columns
-   return(df1)
-
-
-
-def input_mean(df):
-   X = np.asarray(s)
-   from sklearn.impute import SimpleImputer
-   imp_median = SimpleImputer( strategy='mean') #for median imputation replace 'mean' with 'median'
-   print(imp_median.fit(X))
-   X = imp_median.transform(X)
-   df1 = pd.DataFrame(X)
-   df1.columns = df.columns
-   return(df1)
 
 # _______________________________ end_functions__________________________________
 
