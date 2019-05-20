@@ -26,7 +26,7 @@ def get_from_excel(cnx):
         df =pd.read_excel(BytesIO(file),sheet_name =sheet)
         df = df.replace(np.nan, '', regex=True)
         tab = etl.fromdataframe(df)
-       #  tab = etl.fromxlsx(filename=BytesIO(file),sheet =sheet)
+
         return tab
 
 def get_from_csv(cnx):
@@ -39,8 +39,6 @@ def get_from_csv(cnx):
 
         tab = etl.fromdataframe(df) 
 
-       #  tab = etl.fromcsv(link) 
-
         return tab
 
 def get_from_mysql(cnx):
@@ -52,14 +50,11 @@ def get_from_mysql(cnx):
         _DATABASE  = cnx['db_name']
         _TABLE  = cnx['table']
 
-        engine = create_engine('mysql+pymysql://'+_USER+':'+_PASS+'@'+_HOST+':'+_PORT)
-
-        rows = engine.execute('SELECT * FROM '+_DATABASE+'.'+_TABLE)
-
-        data =[dict(row) for row in rows]
-
-        tab  = etl.fromdicts(data)   
+        engine = create_engine('mysql+pymysql://'+_USER+':'+_PASS+'@'+_HOST+':'+_PORT)  
         
+        df = pd.read_sql('SELECT * FROM '+_DATABASE+'.'+_TABLE, con=engine)
+        tab = etl.fromdataframe(df) 
+
         return tab
 
 def mapping(obj):
