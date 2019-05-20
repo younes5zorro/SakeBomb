@@ -223,7 +223,6 @@ def compare():
 @advance_alogs.route('/v1/static', methods=['POST'])
 def get_static():
     if request.method == 'POST':
-        
         json_data = request.get_json()
 
         link  = json_data['link']
@@ -244,16 +243,144 @@ def get_static():
         result = {}
         result_nums  = []
         result_cats  = []
+        if target_key != "" :
+
+                for field in nums:
+                        obj = {}   
+                        obj["data"] =  []
+                        obj["field"]=field
+
+                        target = etl.facet(tab, target_key)
+                        for key in target.keys():
+
+                                stats_obj={}
+
+                                stats_obj["field"]=field
+
+                                stats_obj[target_key]=key
+
+                                stats = etl.stats(target[key], field)
+
+                                stats_res = dict(stats._asdict())
+
+                                stats_res["moyenne"] = stats_res.pop("mean")
+                        
+                                stats_res["ecart-type"] = stats_res.pop("pstdev")
+                                
+                                stats_res["variance"] = stats_res.pop("pvariance")
+
+                                for s in stat_num:
+                                        stats_obj[s]=round(stats_res[s],2)
+
+                                obj["data"].append(stats_obj)
+                        
+                        obj["header"] = list(obj["data"][0].keys())
+
+                        result_nums.append(obj)
+
+                for field in cats:
+
+                              
+                        obj = {}
+                        obj["data"] =  []
+                        obj["field"]=field
+                        
+                        target = etl.facet(tab, target_key)
+                        for key in target.keys():
+
+                                field_inst = etl.facet(target[key], field)
+                                for k in field_inst.keys():
+
+                                        stats_obj = {}
+                                        stats_res ={}
+
+                                        stats_obj[target_key]=key
+                                        stats_obj[field]=k
+                                        
+                                        stats_res["count"],stats_res["frequence"] = etl.valuecount(target[key], field, k)
+                                        for s in stat_cat:
+                                                stats_obj[s]=stats_res[s]
+                                        
+                                        obj["data"].append(stats_obj)
+
+                        obj["header"] = list(obj["data"][0].keys())
+
+                        result_cats.append(obj)
+
+        else:
+                
+                for field in nums:
+                        
+                        obj = {}   
+                        obj["data"] =  []  
+
+                        stats_obj={}
+
+                        obj["field"]=field
+                        stats_obj["field"]=field
+
+                        stats = etl.stats(tab, field)
+
+                        stats_res = dict(stats._asdict())
+
+                        stats_res["moyenne"] = stats_res.pop("mean")
+                
+                        stats_res["ecart-type"] = stats_res.pop("pstdev")
+                        
+                        stats_res["variance"] = stats_res.pop("pvariance")
+
+                        for s in stat_num:
+                                stats_obj[s]=round(stats_res[s],2)
+
+                        obj["data"].append(stats_obj)
+                
+                        obj["header"] = list(obj["data"][0].keys())
+
+                        result_nums.append(obj)
+
+                for field in cats:
+                               
+                        obj = {}
+                        obj["data"] =  []
+
+                        field_inst = etl.facet(tab, field)
+                        for k in field_inst.keys():
+
+                                stats_obj = {}
+                                stats_res ={}
+
+                                stats_obj[field]=k
+                                obj["field"]=field
+                                
+                                stats_res["count"],stats_res["frequence"] = etl.valuecount(tab, field, k)
+                                for s in stat_cat:
+                                        stats_obj[s]=stats_res[s]
+                                
+                                obj["data"].append(stats_obj)
+
+                        obj["header"] = list(obj["data"][0].keys())
+
+                        result_cats.append(obj)
+
+        result["cat"]=result_cats
+        result["num"]=result_nums
+
+        return jsonify(result)
+
+@advance_alogs.route('/v1/tt', methods=['POST'])
+def ttttt():
+        
+        
  
         if target_key != "" :
 
-                target = etl.facet(tab, target_key)
-                for key in target.keys():
+                
 
                         if len(nums) > 0:
 
                                 catss = {}
                                 catss["data"] =  []
+
                                 for field in nums:
 
                                         gg={}
