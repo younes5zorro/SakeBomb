@@ -26,6 +26,28 @@ MODELS_FOLDER = PACKAGE_ROOT / 'saved'
 MODELS_FOLDER.mkdir(exist_ok=True)
   
 
+def get_from_excel(link,sheet):
+
+        file = requests.get(link).content
+        
+        df =pd.read_excel(BytesIO(file),sheet_name =sheet)
+        df = df.replace(np.nan, '', regex=True)
+        tab = etl.fromdataframe(df)
+
+        return tab
+
+def get_from_csv(link):
+
+        file = requests.get(link).content
+        
+        df =pd.read_csv(BytesIO(file))
+
+        tab = etl.fromdataframe(df) 
+
+        return tab
+
+
+
 @advance_alogs.route('/algos', methods=['GET'])
 def algos():
     if request.method == 'GET':
@@ -225,6 +247,12 @@ def get_static():
     if request.method == 'POST':
         json_data = request.get_json()
 
+        tab = {}
+        if  json_data['type'] =="excel":
+                tab = get_from_excel(json_data['link'],json_data['sheet'])
+        elif  json_data['type'] =="csv":
+                tab = get_from_csv(json_data['link'])
+        
         # link  = json_data['link']
 
         # file = requests.get(link).content
@@ -232,9 +260,9 @@ def get_static():
         # df =pd.read_csv(BytesIO(file))
 
 
-        df = pd.DataFrame(json_data['data'])
+        # df = pd.DataFrame(json_data['data'])
 
-        tab = etl.fromdataframe(df) 
+        # tab = etl.fromdataframe(df) 
 
         cats = json_data['cats']
         stat_cat = json_data['stat_cat']
