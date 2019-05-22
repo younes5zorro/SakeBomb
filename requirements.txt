@@ -37,3 +37,4 @@ vaderSentiment==3.2.1
 imgurpython==1.1.7
 matplotlib==2.2.2
 statsmodels==0.9.0
+patsy==0.5.1

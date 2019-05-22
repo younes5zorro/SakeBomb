@@ -25,7 +25,6 @@ def translate_teweet(text):
     translator = Translator()
     translation = translator.translate(text, dest='en')
     return translation.text
-    
 
 def normalize(text,lang):
     if lang != "en":
@@ -34,7 +33,6 @@ def normalize(text,lang):
     text=special_removal(text)
     vs = analyzer.polarity_scores(text)
     return vs["compound"]
-
 
 def initialize_criteria(criteria,since,until,QuerySearch,MaxTweets,Lang):
     criteria.setSince(str(since)) #"yyyy-mm-dd"

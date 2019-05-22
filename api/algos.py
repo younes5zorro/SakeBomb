@@ -225,11 +225,14 @@ def get_static():
     if request.method == 'POST':
         json_data = request.get_json()
 
-        link  = json_data['link']
+        # link  = json_data['link']
 
-        file = requests.get(link).content
+        # file = requests.get(link).content
         
-        df =pd.read_csv(BytesIO(file))
+        # df =pd.read_csv(BytesIO(file))
+
+
+        df = pd.DataFrame(json_data['data'])
 
         tab = etl.fromdataframe(df) 
 

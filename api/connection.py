@@ -11,13 +11,11 @@ import json
 
 advance_app = Blueprint('advance_app', __name__)
 
-
 @advance_app.route('/version', methods=['GET'])
 def version():
     if request.method == 'GET':
         return jsonify({'model_version': '0.0.0',
                         'api_version': '1.1.1'})
-
 
 @advance_app.route('/v1/connect', methods=['POST'])
 def connect_db():
@@ -51,7 +49,6 @@ def connect_db():
 
         # # Step 5: Return the response as JSON
         return jsonify(result) 
-
 
 @advance_app.route('/v1/file', methods=['POST'])
 def connect_file():
@@ -185,9 +182,21 @@ def data_db():
         # data =[dict(row) for row in rows]
 
         # tab  = etl.fromdicts(data)
-        
+        result["categorical"] = []
+        result["numerical"] = []
+
         result["header"] = list(etl.header(tab))
         result["data"] = list(etl.dicts(tab))
+        
+        for var in df.columns:
+
+                if df[var].dtypes=='O':
+                        result["categorical"].append(var)
+                else:
+                        # if len(df[var].unique())<20:
+                        #        result["categorical"].append(var)
+                        # else:
+                                result["numerical"].append(var)
 
         # # Step 5: Return the response as JSON
         return jsonify(result) 

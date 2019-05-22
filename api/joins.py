@@ -10,12 +10,6 @@ import numpy as np
 
 advance_join = Blueprint('advance_join', __name__)
 
-
-@advance_join.route('/jj', methods=['GET'])
-def join_test():
-    if request.method == 'GET':
-        return jsonify({'join_test_version': '0.0.0',
-                        'join_test_api_version': '1.1.1'})
 def get_from_excel(cnx):
 
         link  = cnx['link']
@@ -70,7 +64,6 @@ def mapping(obj):
         if len(obj["header"]) > 0:
                tab  = etl.cat(tab, header=obj["header"])
         return tab
-
 
 def join_table(type,tab_L,tab_R,key_L,key_R):
         if(type =="join"):
