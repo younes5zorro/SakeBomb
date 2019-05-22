@@ -11,6 +11,24 @@ import json
 
 advance_app = Blueprint('advance_app', __name__)
 
+def get_from_excel(link,sheet):
+
+        file = requests.get(link).content
+        
+        df =pd.read_excel(BytesIO(file),sheet_name =sheet)
+        df = df.replace(np.nan, '', regex=True)
+
+        return df
+
+def get_from_csv(link):
+
+        file = requests.get(link).content
+        
+        df =pd.read_csv(BytesIO(file))
+
+        return df
+
+
 @advance_app.route('/version', methods=['GET'])
 def version():
     if request.method == 'GET':
@@ -79,44 +97,53 @@ def connect_file():
         # Step 5: Return the response as JSON
         return jsonify(result) 
 
-@advance_app.route('/v1/data/file/excel', methods=['POST'])
+@advance_app.route('/v1/data/file', methods=['POST'])
 def data_excel():
     if request.method == 'POST':
+        result = {}
+        df ={}
         
         json_data = request.get_json()
+
         link  = json_data['link']
         sheet  = json_data['sheet']
+        type_file =json_data['type']
 
-        file = requests.get(link).content
+        if  type_file =="excel":
+                result["sheet_name"] = sheet
+                df = get_from_excel(link,sheet)
+
+        elif  type_file =="csv":
+                df = get_from_csv(link)
         
-        result = {}
+        # file = requests.get(link).content
+        
 
-        df =pd.read_excel(BytesIO(file),sheet_name =sheet)
-        df = df.replace(np.nan, '', regex=True)
+        # df =pd.read_excel(BytesIO(file),sheet_name =sheet)
+        # df = df.replace(np.nan, '', regex=True)
         tab = etl.fromdataframe(df)
-        if tab:
-                result["sheet_name"] = sheet
-                result["header"] = list(etl.header(tab))
-                result["data"] =  list(etl.dicts(tab))
+        # if tab:
+        result["header"] = list(etl.header(tab))
+        result["data"] =  list(etl.dicts(tab))
 
-                result["categorical"] = []
-                result["numerical"] = []
-                
-                for var in df.columns:
+        result["categorical"] = []
+        result["numerical"] = []
+        
+        for var in df.columns:
 
-                        if df[var].dtypes=='O':
-                                result["categorical"].append(var)
-                        else:
-                                # if len(df[var].unique())<20:
-                                #        result["categorical"].append(var)
-                                # else:
-                                        result["numerical"].append(var)
-        else:
-                result["sheet_name"] = sheet
-                result["header"] = []
-                result["data"] =  []
-                result["categorical"] = []
-                result["numerical"] = []
+                if df[var].dtypes=='O':
+                        result["categorical"].append(var)
+                else:
+                        # if len(df[var].unique())<20:
+                        #        result["categorical"].append(var)
+                        # else:
+                                result["numerical"].append(var)
+        # else:
+        #         result["sheet_name"] = sheet
+        #         result["header"] = []
+        #         result["data"] =  []
+        #         result["categorical"] = []
+        #         result["numerical"] = []
         
         # Step 5: Return the response as JSON
         return jsonify(result) 
