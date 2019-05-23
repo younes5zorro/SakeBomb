@@ -46,6 +46,23 @@ def get_from_csv(link):
 
         return tab
 
+
+def get_df_from_excel(link,sheet):
+
+        file = requests.get(link).content
+        
+        df =pd.read_excel(BytesIO(file),sheet_name =sheet)
+
+        return df
+
+def get_df_from_csv(link):
+
+        file = requests.get(link).content
+        
+        df =pd.read_csv(BytesIO(file))
+
+        return df
+
 @advance_alogs.route('/algos', methods=['GET'])
 def algos():
     if request.method == 'GET':
@@ -75,13 +92,16 @@ def clear():
         MODELS_FOLDER.mkdir(exist_ok=True)
         return jsonify({"message":" removed"})
 
-def get_dataFram(link,input_field,output_field):
+def get_dataFram(json_data):
 
-        file = requests.get(link).content
-        
-        df =pd.read_csv(BytesIO(file))
+        df = {}
+        if  json_data['type'] =="excel":
+                df = get_df_from_excel(json_data['link'],json_data['sheet'])
+        elif  json_data['type'] =="csv":
+                df = get_df_from_csv(json_data['link'])
 
-        input_field.append(output_field)
+        input_field  = json_data["input"]
+        input_field.append(json_data["output"])
 
         df = df[input_field]
 
@@ -136,7 +156,7 @@ def get_model(model_name):
 def get_score(json_data):
         
         result ={}
-        dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
+        dataFrame,train_labels = get_dataFram(json_data)
 
         trainTestValidation=json_data['trainTestValidation']
         model_name  = json_data["model_name"]
@@ -586,7 +606,7 @@ def features_selection():
                 json_data = request.get_json()
 
                 result ={}
-                X_train, y_train= get_ForSelection(json_data["link"],json_data["input"],json_data["output"])
+                X_train, y_train= get_ForSelection(json_data)
 
                 sel_ = SelectFromModel(Lasso(alpha=0.005, random_state=0)) # remember to set the seed, the random state in this function
                 sel_.fit(X_train, y_train)
@@ -607,12 +627,12 @@ def kmeandata():
         if request.method == 'POST':
 
                 json_data = request.get_json()
-                link = json_data["link"]
+                # link = json_data["link"]
                 header = json_data["header"]
 
-                file = requests.get(link).content
+                # file = requests.get(link).content
         
-                df =pd.read_csv(BytesIO(file))
+                df,l =get_dataFram(json_data)
 
                 df = df[header]
 
@@ -620,11 +640,9 @@ def kmeandata():
 
                 return jsonify(result)
 
-def get_ForSelection(link,input_field,output_field):
+def get_ForSelection(json_data):
 
-        file = requests.get(link).content
-        
-        df ,l =get_dataFram(link,input_field,output_field)
+        df ,l =get_dataFram(json_data)
 
         X_train = df.iloc[:,:-1]  #independent columns
         y_train = df.iloc[:,-1] 
@@ -638,7 +656,7 @@ def l_curve():
         result ={}    
         json_data = request.get_json()
         
-        dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
+        dataFrame,train_labels = get_dataFram(json_data)
 
         X = dataFrame.iloc[:,:-1] 
         Y = train_labels
@@ -663,7 +681,7 @@ def v_curve():
         result ={}    
         json_data = request.get_json()
         
-        dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
+        dataFrame,train_labels = get_dataFram(json_data)
 
         X = dataFrame.iloc[:,:-1] 
         Y = train_labels
@@ -697,7 +715,7 @@ def roc_curve():
         result ={}    
         json_data = request.get_json()
         
-        dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
+        dataFrame,train_labels = get_dataFram(json_data)
 
         X = dataFrame.iloc[:,:-1] 
         Y = train_labels
@@ -720,7 +738,7 @@ def cm_curve():
         result ={}    
         json_data = request.get_json()
         
-        dataFrame,train_labels = get_dataFram(json_data["link"],json_data["input"],json_data["output"])
+        dataFrame,train_labels = get_dataFram(json_data)
 
         X = dataFrame.iloc[:,:-1] 
         Y = train_labels
