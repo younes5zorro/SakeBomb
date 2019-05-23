@@ -1,64 +1,53 @@
-
 import pandas as pd
 import numpy as np
 
-from sklearn.metrics import mean_squared_error
-from statsmodels.tsa.arima_model import ARIMA
-from statsmodels.tsa.arima_model import ARIMAResults
+from pyramid.arima import auto_arima
 
-from Models import utils
-from math import sqrt
+file ="https://raw.githubusercontent.com/Pierian-Data/AutoArima-Time-Series-Blog/master/Electric_Production.csv"
 
-#***********Data spliting
+data = pd.read_csv(file,index_col=0)
 
-def splitData(X, test_size):
+data.index = pd.to_datetime(data.index)
 
-    X = X.values
-    size = int(len(X) * test_size)
-    train, test = X[0:size], X[size:]
+data['IPG2211A2N'].plot(figsize=(12,5))
 
-    return train, test
- 
-def arima_orders(p_values, d_values, q_values):
-    orders = list()
-    # create config instances
-    for p in p_values:
-        for d in d_values:
-            for q in q_values:
-                order = (p,d,q)
-                orders.append(order)
-    return orders
+stepwise_model = auto_arima(data, start_p=1, start_q=1,
+                           max_p=3, max_q=3, 
+                           start_P=0, seasonal=False,
+                           d=1, D=1, trace=True,
+                           error_action='ignore',  
+                           suppress_warnings=True, 
+                           stepwise=True)
+                           
+​
+print("order => ",stepwise_model.order)
 
-# evaluate an ARIMA model for a given order (p,d,q)
-def evaluate_arima_model(X,test_size, arima_order):
-	# prepare training dataset
-	train, test =splitData(X, test_size)
+​test_size = 0.8
 
-	history = [x for x in train]
-	# make predictions
-	predictions = list()
-	for t in range(len(test)):
-		model = ARIMA(history, order=arima_order)
-		model_fit = model.fit(disp=0)
-		yhat = model_fit.forecast()[0]
-		predictions.append(yhat)
-		history.append(test[t])
-	# calculate out of sample error
-	error = mean_squared_error(test, predictions)
-	return error
+size = int(len(data) * test_size)
+train, test = data[0:size], data[size:]
 
-# evaluate combinations of p, d and q values for an ARIMA model
-def evaluate_models(dataset, test_size,p_values, d_values, q_values):
-	dataset = dataset.astype('float32')
-	best_score, best_cfg = float("inf"), None
-	for order in arima_orders(p_values, d_values, q_values):
-            # try:
-                mse = evaluate_arima_model(dataset,test_size, order)
-                if mse < best_score:
-                    best_score, best_cfg = mse, order
-                print('ARIMA%s MSE=%.3f' % (order,mse))
-            # except:
-            #     print("apqss")
-            #     continue
-                
-	print('Best ARIMA%s MSE=%.3f' % (best_cfg, best_score))
+train.columns = ['training']
+test.columns = ['test']
+
+
+print("test => ",len(test))
+
+stepwise_model.fit(train)
+
+future_forecast = stepwise_model.predict(n_periods=len(test))
+
+future_forecast = pd.DataFrame(future_forecast,index = test.index,columns=['Prediction'])
+
+pd.concat([test,future_forecast],axis=1).plot(figsize=(12,5))
+
+pd.concat([train,test,future_forecast],axis=1).plot(figsize=(12,5))
+
+import math
+from sklearn.metrics import mean_squared_error,r2_score
+
+rms = math.sqrt(mean_squared_error(test, future_forecast))
+r2 = r2_score(test, future_forecast)
+
+print(rms)
+r2

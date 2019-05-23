@@ -65,6 +65,21 @@ def mapping(obj):
                tab  = etl.cat(tab, header=obj["header"])
         return tab
 
+
+def mapping1(obj):
+        type = obj["type"]
+        tab  ={}
+        if(type =="excel"):
+               tab =  get_from_excel(obj["cnx"])
+        elif(type == "csv"):
+               tab =  get_from_csv(obj["cnx"])
+        elif(type == "mysql"):
+               tab=  get_from_mysql(obj["cnx"])
+        
+        
+        return tab
+
+
 def join_table(type,tab_L,tab_R,key_L,key_R):
         if(type =="join"):
         # equi-join
@@ -137,7 +152,50 @@ def join():
         # Step 5: Return the response as JSON
        return jsonify(result) 
 
-     
+         
+@advance_join.route('/v1/vjoin', methods=['POST'])
+def ttjoin():
+    if request.method == 'POST':
+        
+       json_data = request.get_json()
+
+       result = {}
+
+       tab_L = mapping1(json_data["tabs"][0])
+       
+       key_L = json_data["tabs"][0]["key"]
+       tab_R = mapping1(json_data["tabs"][1])
+       key_R = json_data["tabs"][1]["key"]
+       type_join = json_data["join"]
+
+       tab  = join_table(type_join,tab_L,tab_R,key_L,key_R)
+
+       hlist = json_data["header"]
+       hlist.append(key_L)
+
+       tab  = etl.cat(tab, header=hlist)
+
+       tab = etl.movefield(tab,key_L,0)
+       df = etl.todataframe(tab)
+
+       result["data"] = list(etl.dicts(tab))
+       result["categorical"] = []
+       result["numerical"] = []
+       
+       for var in df.columns:
+
+              if df[var].dtypes=='O':
+                     result["categorical"].append(var)
+              else:
+                     # if len(df[var].unique())<20:
+                     #        result["categorical"].append(var)
+                     # else:
+                            result["numerical"].append(var)
+
+
+        # Step 5: Return the response as JSON
+       return jsonify(result) 
+
 # @advance_join.route('/v1/impute', methods=['POST'])
 # def impute():
 #     if request.method == 'POST':
