@@ -15,6 +15,8 @@ import numpy as np
 
 import Models.curves as curves
 
+from collections import OrderedDict
+
 advance_alogs = Blueprint('advance_alogs', __name__)
 
 PACKAGE_ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -273,14 +275,20 @@ def features_selection():
                 sel_ = SelectFromModel(Lasso(alpha=0.005, random_state=0)) # remember to set the seed, the random state in this function
                 sel_.fit(X_train, y_train)
 
-                selected_feat = X_train.columns[(sel_.get_support())]
+                # selected_feat = X_train.columns[(sel_.get_support())]
 
-                print('total features: {}'.format((X_train.shape[1])))
-                print('selected features: {}'.format(len(selected_feat)))
-                print('features with coefficients shrank to zero: {}'.format(np.sum(sel_.estimator_.coef_ == 0)))
+                # print('total features: {}'.format((X_train.shape[1])))
+                # print('selected features: {}'.format(len(selected_feat)))
+                # print('features with coefficients shrank to zero: {}'.format(np.sum(sel_.estimator_.coef_ == 0)))
+                keys = list(X_train.columns)
+                values  = list(np.around(np.abs(sel_.estimator_.coef_)*100, decimals=2))
 
-                result["labels"] = list(X_train.columns)
-                result["values"] = list(np.around(np.abs(sel_.estimator_.coef_)*100, decimals=2))
+                dictionary = dict(zip(keys, values))
+                
+                dictionary = dict(OrderedDict(sorted(dictionary.items(),reverse=True, key=lambda x: x[1])))
+
+                result["labels"] = list(dictionary)
+                result["values"] = list(dictionary.values())
 
                 return jsonify(result)
 

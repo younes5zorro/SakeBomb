@@ -51,7 +51,7 @@ def splitData(df, test_size):
     
     return df,train, test
 
-def testSetPrediction(X_test,clf):
+def xtestSetPrediction(X_test,clf):
 
     predict_test = clf.predict(n_periods=len(X_test))
     predict_test = pd.DataFrame(predict_test,index = X_test.index,columns=['Prediction'])
@@ -81,10 +81,10 @@ def scoring(y_test,predict_test,clf):
     data["Status"]  ="Train"
 
     data["test_data"] = y_test.iloc[:,0].tolist()
-    data["predict_data"] = predict_test.iloc[:,0].tolist()
+    data["predict_test"] = predict_test.iloc[:,0].tolist()
     data["index_data"] = y_test.index.astype(str).tolist()
     
-    data["Accuracy Trainning"] = math.sqrt(round(r2_score(y_test,predict_test),2)**2)
+    data["Accuracy Trainning"] = round(r2_score(y_test,predict_test),2)**2
 
     if data["Accuracy Trainning"] >= 0.8:
             data["Etat Trainning"] = "Excellent"
@@ -95,50 +95,3 @@ def scoring(y_test,predict_test,clf):
 
     return data
 
-
-
-# # data.index = pd.to_datetime(data.index)
-
-# # data['IPG2211A2N'].plot(figsize=(12,5))
-
-# # stepwise_model = auto_arima(data, start_p=1, start_q=1,
-# #                            max_p=3, max_q=3, 
-# #                            start_P=0, seasonal=False,
-# #                            m=12,
-# #                            d=1, D=1, trace=True,
-# #                            error_action='ignore',  
-# #                            suppress_warnings=True, 
-# #                            stepwise=True)
-                           
-# # ​
-# # print("order => ",stepwise_model.order)
-
-# # ​test_size = 0.8
-
-# # size = int(len(data) * test_size)
-# # train, test = data[0:size], data[size:]
-
-# # train.columns = ['training']
-# # test.columns = ['test']
-
-
-# print("test => ",len(test))
-
-# stepwise_model.fit(train)
-
-# future_forecast = stepwise_model.predict(n_periods=len(test))
-
-# future_forecast = pd.DataFrame(future_forecast,index = test.index,columns=['Prediction'])
-
-# pd.concat([test,future_forecast],axis=1).plot(figsize=(12,5))
-
-# pd.concat([train,test,future_forecast],axis=1).plot(figsize=(12,5))
-
-# import math
-# from sklearn.metrics import mean_squared_error,r2_score
-
-# rms = math.sqrt(mean_squared_error(test, future_forecast))
-# r2 = r2_score(test, future_forecast)
-
-# print(rms)
-# r2
