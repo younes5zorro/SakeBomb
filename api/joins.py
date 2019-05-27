@@ -115,7 +115,7 @@ def join_table(type,tab_L,tab_R,key_L,key_R):
         # Concatenate tables
                return etl.cat(tab_L,tab_R)
         
-@advance_join.route('/v1/join', methods=['POST'])
+@advance_join.route('/v1/vjoin', methods=['POST'])
 def join():
     if request.method == 'POST':
         
@@ -153,7 +153,7 @@ def join():
        return jsonify(result) 
 
          
-@advance_join.route('/v1/vjoin', methods=['POST'])
+@advance_join.route('/v1/join', methods=['POST'])
 def ttjoin():
     if request.method == 'POST':
         
