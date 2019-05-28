@@ -263,8 +263,9 @@ def predict():
         
         di = decode.get(output)
         # {0:"dissatisfied",1:"satisfied"}
-
-        pred =  list(map(di.get, pred))
+        if di:
+                pred =  list(map(di.get, pred))
+                
         if json_data["indep"]:
                 result  = pred
         else:
