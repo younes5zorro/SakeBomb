@@ -251,14 +251,12 @@ def predict():
         columns.append(output)
 
         pred_cols = columns[:-1]
-        # pred_cols = list(pr.columns.values)
-
-        # apply the whole pipeline to data
         pred = list(pd.Series(loaded_model.predict(df[pred_cols].values)))
 
         save_name = str(model_name)+".npy"
+        decode = np.load(UPLOAD_FOLDER / save_name).item()
         
-        di =np.load(UPLOAD_FOLDER / save_name).item().get(output)
+        di = decode.get(output)
         # {0:"dissatisfied",1:"satisfied"}
 
         pred =  list(map(di.get, pred))
@@ -328,12 +326,17 @@ def kmeandata():
 
                 json_data = request.get_json()
                 # link = json_data["link"]
+
+                df = {}
+
+                if  json_data['type'] =="excel":
+                        df = get_df_from_excel(json_data['link'],json_data['sheet'])
+                elif  json_data['type'] =="csv":
+                        df = get_df_from_csv(json_data['link'])
                 header = json_data["header"]
 
                 # file = requests.get(link).content
         
-                df,l =get_dataFram(json_data)
-
                 df = df[header]
 
                 result = df.values.tolist()
