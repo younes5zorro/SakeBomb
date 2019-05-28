@@ -219,13 +219,12 @@ def predict():
     if request.method == 'POST':
         json_data = request.get_json()
         model_name  = json_data["model_name"]
-        link  = json_data["link"]
 
         files = [x.name for x in MODELS_FOLDER.glob('*') if x.is_file() and x.name.split('~~')[2]==model_name+'.pkl']
 
         loaded_model = joblib.load(MODELS_FOLDER / files[0])
 
-        df,train_labels = get_dataFram(json_data["link"])
+        df,train_labels = get_dataFram(json_data)
         pred_cols = list(df.columns.values)[:-1]
         # pred_cols = list(pr.columns.values)
 
