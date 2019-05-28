@@ -246,9 +246,14 @@ def predict():
 
         df,train_labels = get_dataFram(json_data)
 
+        # input_field  = json_data["input"]
+        # input_field.append(json_data["output"])
+
+        # df = df[input_field]
+
         columns = list(df.columns.values)
-        columns.remove(output)
-        columns.append(output)
+        # columns.remove(output)
+        # columns.append(output)
 
         pred_cols = columns[:-1]
         pred = list(pd.Series(loaded_model.predict(df[pred_cols].values)))
