@@ -73,7 +73,7 @@ def autotuning(data,train, seasonal):
     clf.fit(train)
     return clf
     
-def scoring(y_test,predict_test,clf):
+def scoring(y_test,predict_test,clf):   
 
     data={}
 

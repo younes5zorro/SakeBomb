@@ -12,6 +12,7 @@ import requests
 
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import LabelEncoder
 
 import Models.curves as curves
 
@@ -26,7 +27,20 @@ UPLOAD_FOLDER.mkdir(exist_ok=True)
 
 MODELS_FOLDER = PACKAGE_ROOT / 'saved'
 MODELS_FOLDER.mkdir(exist_ok=True)
-  
+
+def encod_aut(df):
+    listcol=list(df.columns.values)
+    result ={}
+    for cool in listcol:
+   
+      if (df[cool]).dtype == 'O':
+        le = LabelEncoder()
+        le.fit(df[cool])
+        df[cool] = le.transform(df[cool])
+        le_name_mapping = dict(zip(le.transform(le.classes_),le.classes_))
+        result[cool] = le_name_mapping
+    
+    return df,result
 
 def get_from_excel(link,sheet):
 
@@ -159,17 +173,23 @@ def get_score(json_data):
         result ={}
         dataFrame,train_labels = get_dataFram(json_data)
 
+        dataFrame, r  = encod_aut(dataFrame)
+        train_labels  = dataFrame.iloc[:,-1]
+
+        
         trainTestValidation=json_data['trainTestValidation']
         model_name  = json_data["model_name"]
         model_type  = json_data["model_type"]
         
+        save_name = str(model_name)+".npy"
+        np.save(UPLOAD_FOLDER / save_name, r)
+
         model = get_model(model_type)
 
         if(json_data['Feautue_Selection'] == True ):
                  dataFrame=model.feature_selector(dataFrame, train_labels)
 
         X_train, y_train, X_val, y_val, X_test, y_test=model.splitData(dataFrame, trainTestValidation)
-
         
         if (json_data['Operation'] == "Default_Parameters"):
                 clf= model.TrainingDefaultParameters(X_train, y_train)
@@ -190,7 +210,6 @@ def get_score(json_data):
         # filename = model_name+"_"+str(randint(0, 3000))+".pkl"
 
         score["Model"] = model_name
-        
 
         result['score'] = score
         if model_type in ["Régression Liniaire"] :
@@ -219,25 +238,37 @@ def predict():
     if request.method == 'POST':
         json_data = request.get_json()
         model_name  = json_data["model_name"]
+        output  = json_data["output"]
 
         files = [x.name for x in MODELS_FOLDER.glob('*') if x.is_file() and x.name.split('~~')[2]==model_name+'.pkl']
 
         loaded_model = joblib.load(MODELS_FOLDER / files[0])
 
         df,train_labels = get_dataFram(json_data)
-        pred_cols = list(df.columns.values)[:-1]
+
+        columns = list(df.columns.values)
+        columns.remove(output)
+        columns.append(output)
+
+        pred_cols = columns[:-1]
         # pred_cols = list(pr.columns.values)
 
         # apply the whole pipeline to data
         pred = list(pd.Series(loaded_model.predict(df[pred_cols].values)))
 
-        di ={0:"dissatisfied",1:"satisfied"}
+        save_name = str(model_name)+".npy"
+        
+        di =np.load(UPLOAD_FOLDER / save_name).item().get(output)
+        # {0:"dissatisfied",1:"satisfied"}
 
         pred =  list(map(di.get, pred))
+        if json_data["indep"]:
+                result  = pred
+        else:
+                df[list(df.columns)[-1]] = pred
+                result = df.to_dict('records')
 
-        df[list(df.columns)[-1]] = pred
-
-        return jsonify(df.to_dict('records'))
+        return jsonify(result)
 
 @advance_alogs.route('/v1/compare', methods=['POST'])
 def compare():
