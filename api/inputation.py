@@ -33,7 +33,7 @@ def knn_inp(df, k):
 #inputation most_frequent/median/mean	  
 def input_most_frequent(df,strategy):
    # strategy = ["most_frequent","mean","median"]
-   X = np.asarray(s)
+   X = np.asarray(df)
    from sklearn.impute import SimpleImputer
    imp_median = SimpleImputer( strategy=strategy) #for median imputation replace 'mean' with 'median'
    print(imp_median.fit(X))

@@ -51,7 +51,7 @@ def splitData(df, test_size):
     
     return df,train, test
 
-def xtestSetPrediction(X_test,clf):
+def testSetPrediction(X_test,clf):
 
     predict_test = clf.predict(n_periods=len(X_test))
     predict_test = pd.DataFrame(predict_test,index = X_test.index,columns=['Prediction'])
