@@ -51,7 +51,6 @@ def TrainingDefaultParameters(X_train, y_train):
     clf.fit(X_train,y_train)
     return clf
 
-
 def TrainingFine_tunning(X_train, y_train,parameters):
     if(parameters != None):
         clf = DecisionTreeClassifier()
@@ -59,11 +58,8 @@ def TrainingFine_tunning(X_train, y_train,parameters):
         clf.fit(X_train,y_train)
         return clf
 
-
-
 #***************************Auto-tuning : choix automatique des macro-paramètres de Decision Tree
 #________________________________________________________________________________________________|
-
 
 def autotuning(X_train, y_train):
 
@@ -76,7 +72,6 @@ def autotuning(X_train, y_train):
     trained_model=clf.best_estimator_.fit(X_train,y_train)
     return trained_model
 
-
 #**************************Make prediction
 #__________________________________________|
 def testSetPrediction(X_test,X_val,clf):
@@ -85,16 +80,14 @@ def testSetPrediction(X_test,X_val,clf):
     predict_val=clf.predict(X_val)
     return predict_test,predict_val
 
-
-
 #**************************Evaluation
 #____________________________________|
 def scoring(y_test,predict_test,y_val,predict_val,clf):
 
     data={}
 
-#     data["accuracy_score_Test"] = accuracy_score(y_test,predict_test)
-#     data["roc_auc_score_Test"] = log_loss(y_test,predict_test)
+        #     data["accuracy_score_Test"] = accuracy_score(y_test,predict_test)
+        #     data["roc_auc_score_Test"] = log_loss(y_test,predict_test)
     data["Model"]  =""    
     data["Status"]  ="Train/validation"
     data["Accuracy Trainning"] = round(accuracy_score(y_test,predict_test),2)
@@ -142,18 +135,3 @@ def  feature_selector(dataFrame,train_labels):
     all_to_remove = fs.check_removal()
 
     return train_no_missing_zero
-
-
-
-# def visualization(dtree):
-#     dot_data = StringIO()
-#     export_graphviz(dtree, out_file=dot_data,
-#                     filled=True, rounded=True,
-#                     special_characters=True)
-#     graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
-#     image=Image(graph.create_png())
-#     utils.ensure_dir("output/visualisation")
-#     Image(graph.write_png('output/visualisation/Tree_visu.png'))
-#     return image
-
-
