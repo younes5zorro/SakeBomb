@@ -365,7 +365,10 @@ def l_curve():
         result ={}    
         json_data = request.get_json()
         
+        
         dataFrame,train_labels = get_dataFram(json_data)
+
+        dataFrame, r  = encod_aut(dataFrame)
 
         X = dataFrame.iloc[:,:-1] 
         Y = train_labels
@@ -390,6 +393,7 @@ def v_curve():
         json_data = request.get_json()
         
         dataFrame,train_labels = get_dataFram(json_data)
+        dataFrame, r  = encod_aut(dataFrame)
 
         X = dataFrame.iloc[:,:-1] 
         Y = train_labels
@@ -424,6 +428,8 @@ def roc_curve():
         
         dataFrame,train_labels = get_dataFram(json_data)
 
+        dataFrame, r  = encod_aut(dataFrame)
+
         X = dataFrame.iloc[:,:-1] 
         Y = train_labels
 
@@ -447,6 +453,8 @@ def cm_curve():
         
         dataFrame,train_labels = get_dataFram(json_data)
 
+        dataFrame, r  = encod_aut(dataFrame)
+        
         X = dataFrame.iloc[:,:-1] 
         Y = train_labels
 
