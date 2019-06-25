@@ -352,6 +352,7 @@ def kmeandata():
 def get_ForSelection(json_data):
 
         df ,l =get_dataFram(json_data)
+        df, r  = encod_aut(dataFrame)
 
         X_train = df.iloc[:,:-1]  #independent columns
         y_train = df.iloc[:,-1] 
