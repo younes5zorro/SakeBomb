@@ -304,7 +304,7 @@ def get_ForSelection(json_data):
         y_train = df.iloc[:,-1] 
 
         return X_train,y_train
-        
+
 @advance_alogs.route('/v1/selection', methods=['POST'])
 def features_selection():
         if request.method == 'POST':
@@ -433,8 +433,9 @@ def roc_curve():
 
         dataFrame, r  = encod_aut(dataFrame)
 
+
         X = dataFrame.iloc[:,:-1] 
-        Y = train_labels
+        Y = dataFrame.iloc[:,-1] 
 
         model_name  = json_data["model_name"]
         model_type  = json_data["model_type"]
@@ -459,7 +460,8 @@ def cm_curve():
         dataFrame, r  = encod_aut(dataFrame)
         
         X = dataFrame.iloc[:,:-1] 
-        Y = train_labels
+        Y = dataFrame.iloc[:,-1]
+        # Y = train_labels
 
         model_name  = json_data["model_name"]
         model_type  = json_data["model_type"]
