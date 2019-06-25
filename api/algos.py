@@ -295,6 +295,16 @@ def compare():
 
         return jsonify(result)
 
+def get_ForSelection(json_data):
+
+        df ,l =get_dataFram(json_data)
+        df, r  = encod_aut(df)
+
+        X_train = df.iloc[:,:-1]  #independent columns
+        y_train = df.iloc[:,-1] 
+
+        return X_train,y_train
+        
 @advance_alogs.route('/v1/selection', methods=['POST'])
 def features_selection():
         if request.method == 'POST':
@@ -349,15 +359,7 @@ def kmeandata():
 
                 return jsonify(result)
 
-def get_ForSelection(json_data):
 
-        df ,l =get_dataFram(json_data)
-        df, r  = encod_aut(df)
-
-        X_train = df.iloc[:,:-1]  #independent columns
-        y_train = df.iloc[:,-1] 
-
-        return X_train,y_train
 
 @advance_alogs.route('/v1/l_curve', methods=['POST'])
 def l_curve():
