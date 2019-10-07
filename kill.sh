@@ -1,0 +1,1 @@
+kill -9 $(sudo lsof -n -i :6001| grep LISTEN | awk '{print $2}')
