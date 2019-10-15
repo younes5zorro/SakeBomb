@@ -522,7 +522,7 @@ def train_segmentation():
 
         model_name  = json_data["model_name"]
         model_type  = json_data["model_type"]
-        n_clusters  = json_data["nbrCluster"]
+        n_clusters  = int(json_data["nbrCluster"])
         
 
 
