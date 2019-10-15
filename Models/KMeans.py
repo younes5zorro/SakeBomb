@@ -19,8 +19,8 @@ def Prediction(df, clf):
     df['cluster'] = clusters
     return df
 
-def Fit_Predict(df, clf):
-
-    clusters=clf.fit_predict(df)
-    df['cluster'] = clusters
-    return df
+def Fit_Predict(df, n_clusters):
+    clf = KMeans(n_clusters=n_clusters)
+    labels = clf.fit_predict(df)
+    
+    return labels 

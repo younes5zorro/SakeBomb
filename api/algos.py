@@ -513,17 +513,27 @@ def train_segmentation():
                 df = get_df_from_excel(json_data['link'],json_data['sheet'])
         elif  json_data['type'] =="csv":
                 df = get_df_from_csv(json_data['link'])
+
         header = json_data["header"]
+
+        df = df[header]
+
+        df_enc,r = encod_aut(df.copy())
 
         model_name  = json_data["model_name"]
         model_type  = json_data["model_type"]
         n_clusters  = json_data["n_clusters"]
         
-        model = get_model(model_type)
-        df = model.Fit_Predict(df,n_clusters).sample(50)
 
-        score['header'] = df.columns
-        score['data'] = df.to_json(orient='records')
+
+        model = get_model(model_type)
+        df["cluster"] = model.Fit_Predict(df_enc,n_clusters)
+
+        tab = etl.fromdataframe(df.sample(50))
+
+        score['header'] = list(df.columns)
+        score['tableData'] = list(etl.dicts(tab))
+        
 
         # filename = model_name+".pkl"
         # joblib.dump(clf, MODELS_FOLDER / filename)
