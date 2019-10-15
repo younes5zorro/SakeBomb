@@ -534,7 +534,29 @@ def train_segmentation():
         score['header'] = list(df.columns)
         score['tableData'] = list(etl.dicts(tab))
         
+        for var in df.columns:
+                if df[var].dtypes=='O' or var=="cluster":
+                        df = pd.concat([df,pd.get_dummies(df[var], prefix=var)],axis=1).drop([var],axis=1)
+                     
 
+        dd = df.corr().to_dict()
+        obj = {}
+        obj["nodes"] = []
+        obj["links"] = []
+
+        for key in dd:
+                obj["nodes"].append({"name":key})
+        
+                for k in dd[key]:
+                
+                        if k == key : continue
+                        obj["links"].append({
+                        "source": key,
+                        "target": k,
+                        "value": np.abs(dd[key][k])*100
+                        })
+       
+        score['graphData']  =obj 
         # filename = model_name+".pkl"
         # joblib.dump(clf, MODELS_FOLDER / filename)
 
