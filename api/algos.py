@@ -42,6 +42,13 @@ def encod_aut(df):
     
     return df,result
 
+def decode_aut(df,dictt):
+        for col in df.columns:
+                if col in dictt:
+                        df[col] = df[col].map(dictt.get(col))   
+
+        return df 
+        
 def get_from_excel(link,sheet):
 
         file = requests.get(link).content
@@ -359,8 +366,6 @@ def kmeandata():
 
                 return jsonify(result)
 
-
-
 @advance_alogs.route('/v1/l_curve', methods=['POST'])
 def l_curve():
     if request.method == 'POST':
@@ -495,4 +500,32 @@ def serie_model():
 
         score = ar.scoring(test_set,predict_set,clf)
         return jsonify(score)
+
+@advance_alogs.route('/v1/segementation', methods=['POST'])
+def train_segmentation():
+    if request.method == 'POST':
+        json_data = request.get_json()
         
+        df = {}
+        score = {}
+
+        if  json_data['type'] =="excel":
+                df = get_df_from_excel(json_data['link'],json_data['sheet'])
+        elif  json_data['type'] =="csv":
+                df = get_df_from_csv(json_data['link'])
+        header = json_data["header"]
+
+        model_name  = json_data["model_name"]
+        model_type  = json_data["model_type"]
+        n_clusters  = json_data["n_clusters"]
+        
+        model = get_model(model_type)
+        df = model.Fit_Predict(df,n_clusters).sample(50)
+
+        score['header'] = df.columns
+        score['data'] = df.to_json(orient='records')
+
+        # filename = model_name+".pkl"
+        # joblib.dump(clf, MODELS_FOLDER / filename)
+
+        return jsonify(score)
